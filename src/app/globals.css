@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+/* ─── Apple typography rules ─── */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.022em;
+  line-height: 1.08;
+  font-weight: 700;
+}
+
+/* macOS system UI sizes — matches actual macOS text hierarchy */
+.apple-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6B6B6B;
+}
+
+.apple-body {
+  font-size: 15px;
+  line-height: 1.47;
+  letter-spacing: -0.01em;
+}
+
+.apple-caption {
+  font-size: 12px;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+
+body {
+  min-height: 100vh;
+  color: #1A1A1A;
+  user-select: none;
+  font-size: 15px;
+  line-height: 1.47;
+  letter-spacing: -0.01em;
+}
+
+input, textarea, p, span, h1, h2, h3, h4, h5, h6, li, blockquote, code, pre {
+  user-select: text;
+}
+
+/* ─── Liquid Glass ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.glass-window {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.glass-menu {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.glass-dock {
+  background: rgba(200, 200, 200, 0.25) !important;
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.3) inset,
+    0 8px 40px rgba(0, 0, 0, 0.35) !important;
+  padding: 8px 12px !important;
+}
+
+/* Menu bar dropdown */
+.glass-dropdown {
+  background: rgba(242, 242, 242, 0.92);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Terminal ─── */
+.terminal-body {
+  background: #1E1E1E;
+  position: relative;
+}
+
+.terminal-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px, rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.terminal-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Menu fade-in ─── */
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ─── Cursor blink ─── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: #FFB800;
+  animation: blink 1s step-start infinite;
+  vertical-align: -2px;
+}
+
+/* ─── Button shimmer ─── */
+@keyframes shimmer {
+  0%   { transform: translateX(-120%) skewX(-12deg); }
+  100% { transform: translateX(220%) skewX(-12deg); }
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  animation: shimmer 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 3px; }
+
+::selection { background: rgba(0,113,227,0.15); color: #1D1D1F; }
