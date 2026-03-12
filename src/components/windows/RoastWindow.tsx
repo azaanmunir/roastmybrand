@@ -149,6 +149,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                 <span
                   style={{
                     display: "inline-block",
+                    color: "#FF3B00",
                     opacity: wordVisible ? 1 : 0,
                     transform: wordVisible ? "translateY(0)" : "translateY(6px)",
                     transition: "opacity 0.3s ease, transform 0.3s ease",
