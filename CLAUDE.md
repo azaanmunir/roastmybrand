@@ -42,6 +42,9 @@ The entire site is a **macOS desktop simulation**. On desktop (`md:` breakpoint 
 ### Window System (`src/app/page.tsx`)
 All window state lives in the root `Page` component. `WindowId = "roast" | "liveroasts" | "terminal" | "wallpapers"`. Each window tracks `{ isOpen, isMinimized, zIndex }`. `bringToFront` increments a shared `topZ` counter. Windows only render when `mounted` (avoids SSR hydration mismatches with `window.innerWidth`).
 
+### Desktop Component Layering
+`src/components/desktop/` contains thin wrappers (`MenuBar.tsx`, `Dock.tsx`) that configure and delegate to the lower-level primitives in `src/components/ui/` (`mac-os-menu-bar.tsx`, `mac-os-dock.tsx`, `spotlight-background.tsx`). Edit the `ui/` primitives for behavior/layout; edit the `desktop/` wrappers for app-specific menu items or dock icons. Shared desktop types live in `src/components/ui/types.ts`.
+
 ### Base Window Component (`src/components/windows/Window.tsx`)
 Reusable draggable macOS window shell. Drag activates only from the title bar (`dragListener={false}`, `dragControls.start(e)` on title bar `onPointerDown`). Traffic light buttons: index 0 = close, index 1 = minimize. `isActive` prop controls shadow depth and dot colors.
 
