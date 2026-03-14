@@ -9,9 +9,11 @@ import RoastWindow from "@/components/windows/RoastWindow";
 import LiveRoastsWindow from "@/components/windows/LiveRoastsWindow";
 import TerminalWindow from "@/components/windows/TerminalWindow";
 import WallpapersWindow from "@/components/windows/WallpapersWindow";
+import HistoryWindow from "@/components/windows/HistoryWindow";
+import ContactWindow from "@/components/windows/ContactWindow";
 import { WALLPAPERS, DEFAULT_WALLPAPER_ID } from "@/lib/wallpapers";
 
-type WindowId = "roast" | "liveroasts" | "terminal" | "wallpapers";
+type WindowId = "roast" | "liveroasts" | "terminal" | "wallpapers" | "history" | "contact";
 
 interface WinState {
   isOpen: boolean;
@@ -24,6 +26,8 @@ const DEFAULT_WINDOWS: Record<WindowId, WinState> = {
   liveroasts:  { isOpen: true,  isMinimized: false, zIndex: 11 },
   terminal:    { isOpen: true,  isMinimized: false, zIndex: 12 },
   wallpapers:  { isOpen: false, isMinimized: false, zIndex: 10 },
+  history:     { isOpen: false, isMinimized: false, zIndex: 10 },
+  contact:     { isOpen: false, isMinimized: false, zIndex: 10 },
 };
 
 const CYCLING_WORDS = [
@@ -182,10 +186,10 @@ export default function Page() {
   const minimizeWindow= (id: WindowId) => setWindows((prev) => ({ ...prev, [id]: { ...prev[id], isMinimized: true } }));
 
   const handleIconClick = (id: string) => {
-    const validIds: WindowId[] = ["roast", "liveroasts", "terminal", "wallpapers"];
     const maps: Record<string, WindowId> = {
       roast: "roast", terminal: "terminal", wallpapers: "wallpapers",
-      about: "roast", pricing: "roast", contact: "roast",
+      history: "history", contact: "contact",
+      about: "roast", pricing: "roast",
     };
     const wid = maps[id] as WindowId | undefined;
     if (!wid) return;
@@ -214,7 +218,7 @@ export default function Page() {
       setShutDown(true);
       setTimeout(() => { setShutDown(false); window.location.reload(); }, 2200);
     }
-    if (action === "contact") { window.open("https://calendly.com", "_blank"); }
+    if (action === "contact") openWindow("contact");
     if (action === "close-window") closeWindow(focusedWindow);
     if (action === "export-report") showToast("📄 Full PDF reports are coming soon. Stay tuned.");
     if (action === "undo") document.execCommand("undo");
@@ -236,6 +240,8 @@ export default function Page() {
     liveroasts: { x: Math.max(20, vw - 380),           y: 310 },
     terminal:   { x: Math.max(20, vw * 0.04),          y: Math.max(150, vh - 540) },
     wallpapers: { x: Math.max(20, (vw - 460) / 2),     y: Math.max(80, (vh - 380) / 2) },
+    history:    { x: Math.max(20, (vw - 520) / 2),     y: Math.max(80, vh * 0.15) },
+    contact:    { x: Math.max(20, vw * 0.62),           y: Math.max(80, vh * 0.12) },
   };
 
   const openWinIds = (Object.entries(windows) as [WindowId, WinState][])
@@ -311,6 +317,31 @@ export default function Page() {
               onMinimize={() => minimizeWindow("wallpapers")}
               initialX={positions.wallpapers.x}
               initialY={positions.wallpapers.y}
+            />
+          )}
+
+          {mounted && windows.history.isOpen && !windows.history.isMinimized && (
+            <HistoryWindow
+              zIndex={windows.history.zIndex}
+              isActive={focusedWindow === "history"}
+              onFocus={() => bringToFront("history")}
+              onClose={() => closeWindow("history")}
+              onMinimize={() => minimizeWindow("history")}
+              initialX={positions.history.x}
+              initialY={positions.history.y}
+              onOpenRoast={() => { openWindow("roast"); closeWindow("history"); }}
+            />
+          )}
+
+          {mounted && windows.contact.isOpen && !windows.contact.isMinimized && (
+            <ContactWindow
+              zIndex={windows.contact.zIndex}
+              isActive={focusedWindow === "contact"}
+              onFocus={() => bringToFront("contact")}
+              onClose={() => closeWindow("contact")}
+              onMinimize={() => minimizeWindow("contact")}
+              initialX={positions.contact.x}
+              initialY={positions.contact.y}
             />
           )}
         </div>

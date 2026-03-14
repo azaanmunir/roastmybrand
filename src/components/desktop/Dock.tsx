@@ -2,7 +2,7 @@
 
 import MacOSDock from "@/components/ui/mac-os-dock";
 
-type DockIconId = "roast" | "terminal" | "about" | "pricing" | "wallpapers" | "contact";
+type DockIconId = "roast" | "terminal" | "history" | "wallpapers" | "pricing" | "contact";
 
 interface DockProps {
   onIconClick: (id: DockIconId) => void;
@@ -10,8 +10,9 @@ interface DockProps {
 }
 
 const DOCK_APPS = [
-  { id: "roast",      name: "Roast My Brand", icon: "https://cdn.jim-nielsen.com/macos/1024/finder-2021-09-10.png?rf=1024" },
+  { id: "roast",      name: "Roast My Brand", icon: "https://cdn.jim-nielsen.com/macos/1024/music-2021-05-25.png?rf=1024" },
   { id: "terminal",   name: "Terminal",        icon: "https://cdn.jim-nielsen.com/macos/1024/terminal-2021-06-03.png?rf=1024" },
+  { id: "history",    name: "History",         icon: "https://cdn.jim-nielsen.com/macos/1024/messages-2021-05-25.png?rf=1024" },
   { id: "wallpapers", name: "Wallpapers",      icon: "https://cdn.jim-nielsen.com/macos/1024/photos-2021-05-28.png?rf=1024" },
   { id: "pricing",    name: "Pricing",         icon: "https://cdn.jim-nielsen.com/macos/1024/notes-2021-05-25.png?rf=1024" },
   { id: "contact",    name: "Contact",         icon: "https://cdn.jim-nielsen.com/macos/1024/mail-2021-05-25.png?rf=1024" },

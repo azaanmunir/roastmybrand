@@ -115,6 +115,24 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
       ? `RoastMyBrand.wtf — ${roastData.brandName}`
       : "RoastMyBrand.wtf — New Roast";
 
+  const saveToHistory = (data: RoastData) => {
+    try {
+      const existing = JSON.parse(localStorage.getItem("roastHistory") || "[]");
+      const entry = {
+        id: Date.now(),
+        brandName: data.brandName,
+        score: data.score,
+        headline: data.headline,
+        whatsBroken: data.whatsBroken,
+        whatsRedeemable: data.whatsRedeemable,
+        verdict: data.verdict,
+        date: new Date().toISOString(),
+      };
+      const updated = [entry, ...existing].slice(0, 10);
+      localStorage.setItem("roastHistory", JSON.stringify(updated));
+    } catch { /* localStorage unavailable */ }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!brandName.trim()) return;
@@ -133,8 +151,10 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
-      setRoastData({ ...data, brandName: brandName.trim() });
+      const roastResult = { ...data, brandName: brandName.trim() };
+      setRoastData(roastResult);
       setMode("result");
+      saveToHistory(roastResult);
     } catch (err) {
       setError(err instanceof Error ? err.message : "The engine went offline. Try again.");
       setMode("idle");
