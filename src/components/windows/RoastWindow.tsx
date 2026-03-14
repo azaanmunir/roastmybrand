@@ -149,7 +149,6 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                 <span
                   style={{
                     display: "inline-block",
-                    color: "#FF3B00",
                     opacity: wordVisible ? 1 : 0,
                     transform: wordVisible ? "translateY(0)" : "translateY(6px)",
                     transition: "opacity 0.3s ease, transform 0.3s ease",
@@ -199,7 +198,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="relative overflow-hidden flex items-center justify-center gap-2 text-white font-sans font-semibold text-sm py-3.5 rounded-lg disabled:opacity-40 transition-shadow duration-200" style={{ background: '#FF3B00', boxShadow: '0 4px 16px rgba(255,59,0,0.35)' }}
+                className="relative overflow-hidden flex items-center justify-center gap-2 bg-accent text-white font-sans font-semibold text-sm py-3.5 rounded-lg disabled:opacity-40 shadow-[0_4px_16px_rgba(0,113,227,0.35)] hover:shadow-[0_8px_28px_rgba(0,113,227,0.4)] transition-shadow duration-200 btn-shimmer"
               >
                 <Flame size={15} />
                 Roast My Brand
