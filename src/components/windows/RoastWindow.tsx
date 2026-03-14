@@ -46,9 +46,10 @@ interface Props {
   onMinimize: () => void;
   initialX: number;
   initialY: number;
+  resetKey?: number;
 }
 
-export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY }: Props) {
+export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY, resetKey }: Props) {
   const [mode, setMode]         = useState<Mode>("idle");
   const [wordIndex, setWordIndex] = useState(0);
   const [wordVisible, setWordVisible] = useState(true);
@@ -68,6 +69,15 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
   const [url, setUrl]           = useState("");
   const [roastData, setRoastData] = useState<RoastData | null>(null);
   const [error, setError]       = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!resetKey) return;
+    setMode("idle");
+    setBrandName("");
+    setUrl("");
+    setRoastData(null);
+    setError(null);
+  }, [resetKey]);
   const cardRef                 = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 

@@ -140,7 +140,7 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
     currentPositions.length > 0
       ? Math.max(...currentPositions.map((pos, index) =>
           pos + (baseIconSize * currentScales[index]) / 2
-        )) + baseIconSize * 0.5
+        ))
       : (apps.length * (baseIconSize + baseSpacing)) - baseSpacing;
 
   const padding = 8;

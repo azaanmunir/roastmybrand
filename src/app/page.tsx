@@ -160,6 +160,10 @@ export default function Page() {
   const [focusedWindow, setFocused]     = useState<WindowId>("roast");
   const [wallpaperId, setWallpaperId]   = useState(DEFAULT_WALLPAPER_ID);
   const [shutDown, setShutDown]         = useState(false);
+  const [toast, setToast]               = useState<string | null>(null);
+  const [aboutOpen, setAboutOpen]       = useState(false);
+  const [resetKey, setResetKey]         = useState(0);
+  const toastTimer                      = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -188,6 +192,12 @@ export default function Page() {
     openWindow(wid);
   };
 
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 3200);
+  }, []);
+
   const handleMenuAction = (action: string) => {
     if (action === "wallpapers") openWindow("wallpapers");
     if (action === "toggle-terminal") {
@@ -205,6 +215,13 @@ export default function Page() {
       setTimeout(() => { setShutDown(false); window.location.reload(); }, 2200);
     }
     if (action === "contact") { window.open("https://calendly.com", "_blank"); }
+    if (action === "close-window") closeWindow(focusedWindow);
+    if (action === "export-report") showToast("📄 Full PDF reports are coming soon. Stay tuned.");
+    if (action === "undo") document.execCommand("undo");
+    if (action === "redo") document.execCommand("redo");
+    if (action === "clear-form") { openWindow("roast"); setResetKey((k) => k + 1); }
+    if (action === "about") setAboutOpen(true);
+    if (action === "report-bug") window.open("https://github.com/issues", "_blank");
   };
 
   const wallpaper = WALLPAPERS.find((w) => w.id === wallpaperId) ?? WALLPAPERS[0];
@@ -215,9 +232,9 @@ export default function Page() {
   // RoastWindow: centered, 62vw wide
   const roastW = Math.min(vw * 0.62, 820);
   const positions = {
-    roast:      { x: Math.max(20, (vw - roastW) / 2), y: 40 },
-    liveroasts: { x: Math.max(20, vw - 300),           y: 80 },
-    terminal:   { x: Math.max(20, vw * 0.04),          y: Math.max(150, vh - 420) },
+    roast:      { x: Math.max(20, (vw - roastW) / 2), y: 130 },
+    liveroasts: { x: Math.max(20, vw - 330),           y: 320 },
+    terminal:   { x: Math.max(20, vw * 0.04),          y: Math.max(150, vh - 540) },
     wallpapers: { x: Math.max(20, (vw - 460) / 2),     y: Math.max(80, (vh - 380) / 2) },
   };
 
@@ -255,6 +272,7 @@ export default function Page() {
               onMinimize={() => minimizeWindow("roast")}
               initialX={positions.roast.x}
               initialY={positions.roast.y}
+              resetKey={resetKey}
             />
           )}
 
@@ -313,6 +331,63 @@ export default function Page() {
               className="fixed inset-0 bg-black z-[999] flex items-center justify-center"
             >
               <p className="font-sans text-white/30 text-sm">🔊 Shutting down…</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Toast notification */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              key={toast}
+              initial={{ opacity: 0, y: 12, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.97 }}
+              transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+              className="fixed bottom-28 left-1/2 -translate-x-1/2 z-[500] pointer-events-none"
+            >
+              <div className="glass-window rounded-xl px-4 py-2.5 font-sans text-[13px] text-[#1A1A1A] shadow-lg whitespace-nowrap">
+                {toast}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* About modal */}
+        <AnimatePresence>
+          {aboutOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="fixed inset-0 z-[490] flex items-center justify-center"
+              onClick={() => setAboutOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.94, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
+                transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+                className="glass-window rounded-2xl p-8 w-80 text-center shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Flame size={32} className="text-white" />
+                </div>
+                <h2 className="font-display text-xl italic text-[#1A1A1A] mb-1">RoastMyBrand.wtf</h2>
+                <p className="font-sans text-[12px] text-[#9B9B9B] mb-4">Version 1.0 — Built to hurt feelings</p>
+                <div className="border-t border-black/[0.07] pt-4 space-y-1">
+                  <p className="font-sans text-[12px] text-[#6B6B6B]">Made with rage and love by</p>
+                  <p className="font-sans text-[13px] font-semibold text-[#1A1A1A]">Azaan Ali</p>
+                </div>
+                <button
+                  onClick={() => setAboutOpen(false)}
+                  className="mt-5 w-full py-2 rounded-lg bg-black/[0.05] hover:bg-black/[0.09] font-sans text-[13px] text-[#1A1A1A] transition-colors"
+                >
+                  OK
+                </button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

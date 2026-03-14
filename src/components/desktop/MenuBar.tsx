@@ -12,18 +12,18 @@ const ROAST_MENUS = [
     items: [
       { label: "New Roast", action: "new-roast", shortcut: "⌘N" },
       { type: "separator" as const },
-      { label: "Export Report…", shortcut: "⌘E" },
+      { label: "Export Report…", action: "export-report", shortcut: "⌘E" },
       { type: "separator" as const },
-      { label: "Close Window", shortcut: "⌘W" },
+      { label: "Close Window", action: "close-window", shortcut: "⌘W" },
     ],
   },
   {
     label: "Edit",
     items: [
-      { label: "Undo", shortcut: "⌘Z" },
-      { label: "Redo", shortcut: "⌘⇧Z" },
+      { label: "Undo", action: "undo", shortcut: "⌘Z" },
+      { label: "Redo", action: "redo", shortcut: "⌘⇧Z" },
       { type: "separator" as const },
-      { label: "Clear Form", shortcut: "⌘⇧K" },
+      { label: "Clear Form", action: "clear-form", shortcut: "⌘⇧K" },
     ],
   },
   {
@@ -38,10 +38,10 @@ const ROAST_MENUS = [
   {
     label: "Help",
     items: [
-      { label: "About RoastMyBrand.wtf" },
+      { label: "About RoastMyBrand.wtf", action: "about" },
       { type: "separator" as const },
       { label: "Talk to Azaan →", action: "contact" },
-      { label: "Report a Bug" },
+      { label: "Report a Bug", action: "report-bug" },
     ],
   },
 ];

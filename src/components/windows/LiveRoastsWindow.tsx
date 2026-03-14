@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Flame } from "lucide-react";
 import Window from "./Window";
 
 interface RoastEntry {
@@ -27,8 +28,9 @@ const MOCK_ROASTS: Omit<RoastEntry, "id">[] = [
   { brand: "C***o B***d",       score: 9,  emoji: "🏆", age: "48m ago" },
 ];
 
-const scoreColor = (s: number) =>
-  s <= 3 ? "#FF3B30" : s <= 6 ? "#FF9500" : "#34C759";
+const scoreColor  = (s: number) => s <= 3 ? "#FF3B30" : s <= 6 ? "#FF9500" : "#34C759";
+const scoreBg     = (s: number) => s <= 3 ? "rgba(255,59,48,0.10)" : s <= 6 ? "rgba(255,149,0,0.10)" : "rgba(52,199,89,0.10)";
+const scoreLabel  = (s: number) => s <= 3 ? "Destroyed" : s <= 5 ? "Rough" : s <= 7 ? "Decent" : "Strong";
 
 let nextId = 1;
 
@@ -49,12 +51,12 @@ export default function LiveRoastsWindow({
     MOCK_ROASTS.slice(0, 5).map((r) => ({ ...r, id: nextId++ }))
   );
   const [cursor, setCursor] = useState(5);
+  const [totalCount] = useState(1247);
 
-  /* Add a new entry every 4s */
   useEffect(() => {
     const id = setInterval(() => {
       const next = MOCK_ROASTS[cursor % MOCK_ROASTS.length];
-      setFeed((prev) => [{ ...next, id: nextId++, age: "just now" }, ...prev].slice(0, 8));
+      setFeed((prev) => [{ ...next, id: nextId++, age: "just now" }, ...prev].slice(0, 7));
       setCursor((c) => c + 1);
     }, 4000);
     return () => clearInterval(id);
@@ -62,67 +64,110 @@ export default function LiveRoastsWindow({
 
   return (
     <Window
-      title="Live Roasts — 847 brands roasted"
+      title="Live Roasts"
       initialX={initialX}
       initialY={initialY}
-      width={300}
+      width={320}
       zIndex={zIndex}
       isActive={isActive}
       onFocus={onFocus}
       onClose={onClose}
       onMinimize={onMinimize}
     >
-      <div className="p-3">
-        {/* Live indicator */}
-        <div className="flex items-center gap-2 mb-3">
-          <motion.div
-            className="w-2 h-2 rounded-full bg-[#FF3B30]"
-            animate={{ opacity: [1, 0.3, 1] }}
-            transition={{ duration: 1.4, repeat: Infinity }}
-          />
-          <span className="font-sans text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.14em]">
-            Live
-          </span>
+      <div className="flex flex-col" style={{ minHeight: 0 }}>
+
+        {/* Header */}
+        <div className="px-4 pt-3 pb-3 border-b border-black/[0.06]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <motion.div
+                className="w-2 h-2 rounded-full bg-[#FF3B30]"
+                animate={{ opacity: [1, 0.25, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+              <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.13em] text-[#6B6B6B]">
+                Live
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-black/[0.04] rounded-full px-2.5 py-1">
+              <Flame size={10} className="text-[#FF9500]" />
+              <span className="font-sans text-[11px] font-semibold text-[#1A1A1A]">
+                {totalCount.toLocaleString()} roasted
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Feed */}
-        <div className="space-y-1.5 overflow-hidden" style={{ maxHeight: "280px" }}>
+        <div className="overflow-hidden flex-1" style={{ maxHeight: 340 }}>
           <AnimatePresence mode="popLayout" initial={false}>
             {feed.map((entry) => (
               <motion.div
                 key={entry.id}
                 layout
-                initial={{ opacity: 0, y: -12, scale: 0.97 }}
+                initial={{ opacity: 0, y: -16, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-                className="flex items-center gap-2.5 glass rounded-lg px-3 py-2"
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{ duration: 0.32, ease: [0.25, 0.1, 0.25, 1] }}
+                className="px-4 py-3 border-b border-black/[0.05] last:border-0"
+                style={{ backgroundColor: scoreBg(entry.score) }}
               >
-                {/* Score */}
-                <span
-                  className="font-display leading-none shrink-0"
-                  style={{ fontSize: "1.6rem", color: scoreColor(entry.score) }}
-                >
-                  {entry.score}
-                </span>
+                <div className="flex items-center gap-3">
+                  {/* Score badge */}
+                  <div
+                    className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: `${scoreColor(entry.score)}18`, border: `1.5px solid ${scoreColor(entry.score)}30` }}
+                  >
+                    <span
+                      className="font-display leading-none font-bold"
+                      style={{ fontSize: "1.15rem", color: scoreColor(entry.score) }}
+                    >
+                      {entry.score}
+                    </span>
+                  </div>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-sans text-[12px] font-semibold text-[#1A1A1A] truncate">
-                    {entry.brand}
-                  </p>
-                  <p className="font-sans text-[10px] text-[#9B9B9B]">
-                    {entry.score}/10 {entry.emoji} · {entry.age}
-                  </p>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <p className="font-sans text-[12.5px] font-semibold text-[#1A1A1A] truncate">
+                        {entry.brand}
+                      </p>
+                      <span className="font-sans text-[10px] text-[#AAAAAA] shrink-0">{entry.age}</span>
+                    </div>
+
+                    {/* Score bar */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-[3px] rounded-full bg-black/[0.07] overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: scoreColor(entry.score) }}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${entry.score * 10}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                        />
+                      </div>
+                      <span
+                        className="font-sans text-[10px] font-medium shrink-0"
+                        style={{ color: scoreColor(entry.score) }}
+                      >
+                        {scoreLabel(entry.score)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
 
-        <p className="font-sans text-[10px] text-[#C0C0C0] text-center mt-3">
-          Updated in real time · Names anonymized
-        </p>
+        {/* Footer */}
+        <div className="px-4 py-2.5 border-t border-black/[0.06] flex items-center justify-between">
+          <span className="font-sans text-[10px] text-[#C0C0C0]">Names anonymized</span>
+          <span className="font-sans text-[10px] text-[#AAAAAA] font-medium cursor-pointer hover:text-[#1A1A1A] transition-colors">
+            Roast yours →
+          </span>
+        </div>
+
       </div>
     </Window>
   );
