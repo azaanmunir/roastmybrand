@@ -88,7 +88,7 @@ input, textarea, p, span, h1, h2, h3, h4, h5, h6, li, blockquote, code, pre {
   border-bottom: none;
   border-radius: 1.5rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
 }
 
 /* Menu bar dropdown */
