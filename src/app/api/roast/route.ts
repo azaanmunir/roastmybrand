@@ -4,6 +4,35 @@ import type { RoastOutput } from "@/lib/types";
 
 const client = new Anthropic();
 
+const SYSTEM_PROMPT = `You are a brutally honest brand identity critic with 15 years of experience in visual branding, brand strategy, and design systems. You evaluate brands specifically on their BRANDING — not their product, service, or business model.
+
+You assess:
+1. Logo & Visual Mark — is it distinctive, scalable, memorable?
+2. Typography — does the font choice reflect the brand personality?
+3. Color Palette — is it strategic, differentiated, emotionally resonant?
+4. Brand Voice & Tagline — is it clear, ownable, free of jargon?
+5. Visual Consistency — does it feel like a coherent system?
+6. Market Positioning — does the brand look like it belongs in its category or does it blend in?
+
+You do NOT comment on the product, pricing, or business strategy. You are not a business consultant. You are a brand critic.
+
+Your tone is sharp, direct, and specific — like a senior creative director giving feedback to a junior designer. No fluff. No generic advice. Every critique must be specific to THIS brand.
+
+Never use the word 'AI'. You are the roast engine.
+
+Respond ONLY with a valid JSON object — no prose, no markdown, no code fences. Raw JSON only:
+{
+  "score": <1-10 integer, 1=brand disaster, 10=world class>,
+  "headline": "<one brutal sentence summarizing the brand problem>",
+  "whatsBroken": [
+    "<specific branding issue 1>",
+    "<specific branding issue 2>",
+    "<specific branding issue 3>"
+  ],
+  "whatsRedeemable": "<one specific thing that actually works>",
+  "verdict": "<two sentences — what this brand communicates vs what it should>"
+}`;
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
 
@@ -11,44 +40,55 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Brand name required" }, { status: 400 });
   }
 
-  const { brandName, url } = body as { brandName: string; url?: string };
+  const { brandName, url, file } = body as {
+    brandName: string;
+    url?: string;
+    file?: { data: string; mediaType: string };
+  };
 
-  const prompt = `You are a brutally honest brand consultant who roasts brand identities. Think Gordon Ramsay meets senior brand strategist. You are direct, cutting, and funny — but always specific and constructive. Never vague. End every roast with exactly one redemption arc.
-
-Brand submitted for roasting:
+  const userTextContent = `Brand submitted for roasting:
 - Name: ${brandName}
-${url ? `- URL / logo: ${url}` : "- No URL provided — roast based on the brand name alone, what it implies, and who likely built it."}
+${url ? `- URL / logo reference: ${url}` : "- No URL provided — roast based on the brand name alone, what it implies, and who likely built it."}
+${file ? "- Brand asset attached. Analyze the visual identity from what you can see." : ""}
 
-Respond ONLY with a valid JSON object. No prose before or after. No markdown. No code block. Raw JSON only.
+Be specific to this brand. No generic filler. Make it sting.`;
 
-{
-  "score": <integer 1–10, where 1 is catastrophic and 10 is genuinely exceptional — be harsh, most brands are 3–6>,
-  "headline": "<one brutal roast sentence, max 15 words, punchy and specific>",
-  "whatsBroken": [
-    "<specific issue 1 — name the exact problem>",
-    "<specific issue 2>",
-    "<specific issue 3>"
-  ],
-  "whatsRedeemable": "<one thing genuinely worth saving — be specific, not generic>",
-  "verdict": "<closing 2-sentence verdict — brutally honest, ends with a real path forward>"
-}
+  type ContentBlock =
+    | { type: "text"; text: string }
+    | { type: "image"; source: { type: "base64"; media_type: string; data: string } }
+    | { type: "document"; source: { type: "base64"; media_type: string; data: string } };
 
-Be specific to this brand. No generic filler like 'needs improvement'. Make it sting.`;
+  const userContent: ContentBlock[] = [];
+
+  if (file) {
+    if (file.mediaType === "application/pdf") {
+      userContent.push({
+        type: "document",
+        source: { type: "base64", media_type: "application/pdf", data: file.data },
+      });
+    } else {
+      userContent.push({
+        type: "image",
+        source: { type: "base64", media_type: file.mediaType, data: file.data },
+      });
+    }
+  }
+
+  userContent.push({ type: "text", text: userTextContent });
 
   try {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 600,
-      messages: [{ role: "user", content: prompt }],
+      max_tokens: 700,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userContent }],
     });
 
     const rawText =
       message.content[0].type === "text" ? message.content[0].text.trim() : "";
 
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("No JSON found in model response");
-    }
+    if (!jsonMatch) throw new Error("No JSON found in model response");
 
     const roast = JSON.parse(jsonMatch[0]) as RoastOutput;
 

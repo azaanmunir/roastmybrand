@@ -233,7 +233,7 @@ export default function Page() {
   const roastW = Math.min(vw * 0.62, 820);
   const positions = {
     roast:      { x: Math.max(20, (vw - roastW) / 2), y: 130 },
-    liveroasts: { x: Math.max(20, vw - 330),           y: 320 },
+    liveroasts: { x: Math.max(20, vw - 380),           y: 310 },
     terminal:   { x: Math.max(20, vw * 0.04),          y: Math.max(150, vh - 540) },
     wallpapers: { x: Math.max(20, (vw - 460) / 2),     y: Math.max(80, (vh - 380) / 2) },
   };

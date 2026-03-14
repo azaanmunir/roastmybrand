@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Tag, Link2, Flame, X, CheckCircle2, AlertCircle, Download, Lock, ArrowRight } from "lucide-react";
+import { Tag, Link2, Flame, X, CheckCircle2, AlertCircle, Download, Lock, ArrowRight, UploadCloud } from "lucide-react";
 import Window from "./Window";
 import type { RoastData } from "@/lib/types";
 
@@ -69,6 +69,9 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
   const [url, setUrl]           = useState("");
   const [roastData, setRoastData] = useState<RoastData | null>(null);
   const [error, setError]       = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; data: string; mediaType: string } | null>(null);
+  const [fileError, setFileError]       = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!resetKey) return;
@@ -77,7 +80,33 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     setUrl("");
     setRoastData(null);
     setError(null);
+    setUploadedFile(null);
+    setFileError(null);
   }, [resetKey]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileError(null);
+    if (file.size > 15 * 1024 * 1024) {
+      setFileError("File too large — max 15MB.");
+      e.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(",")[1];
+      setUploadedFile({ name: file.name, data: base64, mediaType: file.type });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
+    setFileError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
   const cardRef                 = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
@@ -96,7 +125,11 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
       const res  = await fetch("/api/roast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandName: brandName.trim(), url: url.trim() }),
+        body: JSON.stringify({
+          brandName: brandName.trim(),
+          url: url.trim(),
+          ...(uploadedFile ? { file: { data: uploadedFile.data, mediaType: uploadedFile.mediaType } } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
@@ -123,7 +156,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     }
   };
 
-  const resetToForm = () => { setMode("idle"); setRoastData(null); setBrandName(""); setUrl(""); };
+  const resetToForm = () => { setMode("idle"); setRoastData(null); setBrandName(""); setUrl(""); setUploadedFile(null); setFileError(null); };
 
   return (
     <Window
@@ -194,6 +227,42 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                   onChange={(e) => setUrl(e.target.value)}
                   className="w-full rounded-lg pl-9 pr-4 py-3 font-sans text-sm text-[#1A1A1A] placeholder-[rgba(0,0,0,0.28)] focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition-all duration-200" style={{ background: '#F5F5F5', border: '1px solid #E0E0E0' }}
                 />
+              </div>
+
+              {/* File upload */}
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/pdf,application/pdf"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                {uploadedFile ? (
+                  <div className="flex items-center gap-2 rounded-lg px-3 py-2.5 font-sans text-[12px]" style={{ background: "#F0F7FF", border: "1px solid #C7DDF8" }}>
+                    <UploadCloud size={13} className="text-accent shrink-0" />
+                    <span className="flex-1 truncate text-[#1A1A1A] font-medium">{uploadedFile.name}</span>
+                    <button type="button" onClick={removeFile} className="shrink-0 text-[#9B9B9B] hover:text-[#FF3B30] transition-colors">
+                      <X size={13} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full h-20 rounded-lg flex flex-col items-center justify-center gap-1 transition-colors duration-150 hover:bg-black/[0.03]"
+                    style={{ border: "1.5px dashed #D0D0D0", background: "transparent" }}
+                  >
+                    <UploadCloud size={18} className="text-[#AAAAAA]" />
+                    <span className="font-sans text-[12px] text-[#6B6B6B]">Drop your brand assets here — logo, guidelines, mockups</span>
+                    <span className="font-sans text-[10px] text-[#AAAAAA]">PNG, JPG, PDF up to 15MB</span>
+                  </button>
+                )}
+                {fileError && (
+                  <div className="flex items-center gap-1.5 mt-1.5 text-[#FF3B30] font-sans text-[11px]">
+                    <AlertCircle size={11} /> {fileError}
+                  </div>
+                )}
               </div>
 
               {error && (
