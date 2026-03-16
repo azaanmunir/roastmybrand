@@ -28,8 +28,8 @@ const MOCK_ROASTS = [
 const scoreColor = (s: number) =>
   s <= 3 ? "#FF3B30" : s <= 6 ? "#FF9500" : "#34C759";
 const scoreLabel = (s: number) =>
-  ["", "Catastrophic", "Critical", "Needs Surgery", "Below Average", "Mediocre",
-   "Passable", "Decent", "Strong", "Excellent", "Flawless"][s] ?? "";
+  ["", "Brand Disaster", "Brand Disaster", "Brand Disaster", "Needs Work", "Needs Work",
+   "Getting There", "Pretty Solid", "Strong Brand", "Exceptional", "World Class"][s] ?? "";
 const scoreBgMuted = (s: number) =>
   s <= 3 ? "rgba(255,59,48,0.08)" : s <= 6 ? "rgba(255,149,0,0.08)" : "rgba(52,199,89,0.08)";
 
@@ -348,9 +348,16 @@ function ContactSheetContent() {
   const [message, setMessage] = useState("");
 
   const handleSend = () => {
-    const subject = `Brand Consultation — ${name}`;
-    const body    = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
-    window.open(`mailto:azaan@sevent3.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank");
+    const subject = encodeURIComponent(
+      `Brand Inquiry from RoastMyBrand.wtf — ${name}`
+    );
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n---\nSent from roastmybrand.wtf`
+    );
+    window.open(
+      `mailto:azaanmunirpk@gmail.com?subject=${subject}&body=${body}`,
+      '_blank'
+    );
   };
 
   return (
@@ -358,7 +365,7 @@ function ContactSheetContent() {
       <div className="rounded-2xl p-5 mb-5" style={{ background: "linear-gradient(135deg, #0071E3 0%, #0051A8 100%)" }}>
         <p className="font-sans text-[12px] text-white/70 mb-1 uppercase tracking-widest">Free 30-min call</p>
         <p className="font-sans text-[17px] font-semibold text-white mb-3">Book a brand audit session</p>
-        <a href="https://calendly.com" target="_blank" rel="noopener noreferrer"
+        <a href="https://calendly.com/azaanmunirpk" target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-center w-full py-2.5 bg-white text-[#0071E3] font-sans text-[14px] font-semibold rounded-xl">
           Book on Calendly →
         </a>

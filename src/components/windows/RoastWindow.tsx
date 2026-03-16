@@ -29,8 +29,8 @@ const scoreColor = (s: number) =>
   s <= 3 ? "#FF3B30" : s <= 6 ? "#FF9500" : "#34C759";
 
 const scoreLabel = (s: number) =>
-  ["", "Catastrophic", "Critical", "Needs Surgery", "Below Average", "Mediocre",
-   "Passable", "Decent", "Strong", "Excellent", "Flawless"][s] ?? "";
+  ["", "Brand Disaster", "Brand Disaster", "Brand Disaster", "Needs Work", "Needs Work",
+   "Getting There", "Pretty Solid", "Strong Brand", "Exceptional", "World Class"][s] ?? "";
 
 /* ── Roadmap items (blurred teaser) ── */
 const ROADMAP = [

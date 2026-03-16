@@ -24,11 +24,16 @@ export default function ContactWindow({
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent("Brand Inquiry from RoastMyBrand.wtf");
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+    const subject = encodeURIComponent(
+      `Brand Inquiry from RoastMyBrand.wtf — ${name}`
     );
-    window.location.href = `mailto:azaan@sevent3.com?subject=${subject}&body=${body}`;
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n---\nSent from roastmybrand.wtf`
+    );
+    window.open(
+      `mailto:azaanmunirpk@gmail.com?subject=${subject}&body=${body}`,
+      '_blank'
+    );
   };
 
   const inputCls = "w-full rounded-lg px-3 py-2.5 font-sans text-[13px] text-[#1A1A1A] placeholder-[rgba(0,0,0,0.28)] focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition-all duration-200";
@@ -62,7 +67,7 @@ export default function ContactWindow({
             </div>
           </div>
           <motion.a
-            href="https://calendly.com"
+            href="https://calendly.com/azaanmunirpk"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.015 }}
