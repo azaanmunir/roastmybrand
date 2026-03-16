@@ -5,7 +5,7 @@ import { Wifi, Battery } from 'lucide-react';
 
 // Types
 interface MenuItemOption {
-  label: string;
+  label?: string;
   action?: string;
   shortcut?: string;
   type?: 'item' | 'separator';

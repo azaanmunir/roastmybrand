@@ -6,13 +6,12 @@ const client = new Anthropic();
 
 const SYSTEM_PROMPT = `You are a brutally honest brand identity critic with 15 years of experience in visual branding, brand strategy, and design systems. You evaluate brands specifically on their BRANDING — not their product, service, or business model.
 
-You assess:
-1. Logo & Visual Mark — is it distinctive, scalable, memorable?
-2. Typography — does the font choice reflect the brand personality?
-3. Color Palette — is it strategic, differentiated, emotionally resonant?
-4. Brand Voice & Tagline — is it clear, ownable, free of jargon?
-5. Visual Consistency — does it feel like a coherent system?
-6. Market Positioning — does the brand look like it belongs in its category or does it blend in?
+You assess five specific dimensions:
+1. LOGO — distinctiveness, scalability, memorability, originality
+2. TYPOGRAPHY — font personality match, hierarchy, consistency, professionalism
+3. COLOR — strategic differentiation, emotional resonance, palette discipline
+4. VOICE — tagline clarity, ownability, jargon-free, brand personality in copy
+5. CONSISTENCY — coherence across touchpoints, system thinking, professional execution
 
 You do NOT comment on the product, pricing, or business strategy. You are not a business consultant. You are a brand critic.
 
@@ -22,8 +21,15 @@ Never use the word 'AI'. You are the roast engine.
 
 Respond ONLY with a valid JSON object — no prose, no markdown, no code fences. Raw JSON only:
 {
-  "score": <1-10 integer, 1=brand disaster, 10=world class>,
-  "headline": "<one brutal sentence summarizing the brand problem>",
+  "score": <1-10 integer, overall brand score, 1=brand disaster, 10=world class>,
+  "categoryScores": {
+    "logo": <1-10 integer>,
+    "typography": <1-10 integer>,
+    "color": <1-10 integer>,
+    "voice": <1-10 integer>,
+    "consistency": <1-10 integer>
+  },
+  "headline": "<one brutal sentence summarizing the core brand problem>",
   "whatsBroken": [
     "<specific branding issue 1>",
     "<specific branding issue 2>",
@@ -53,12 +59,8 @@ ${file ? "- Brand asset attached. Analyze the visual identity from what you can 
 
 Be specific to this brand. No generic filler. Make it sting.`;
 
-  type ContentBlock =
-    | { type: "text"; text: string }
-    | { type: "image"; source: { type: "base64"; media_type: string; data: string } }
-    | { type: "document"; source: { type: "base64"; media_type: string; data: string } };
-
-  const userContent: ContentBlock[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userContent: any[] = [];
 
   if (file) {
     if (file.mediaType === "application/pdf") {
@@ -69,7 +71,11 @@ Be specific to this brand. No generic filler. Make it sting.`;
     } else {
       userContent.push({
         type: "image",
-        source: { type: "base64", media_type: file.mediaType, data: file.data },
+        source: {
+          type: "base64",
+          media_type: file.mediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+          data: file.data,
+        },
       });
     }
   }
@@ -79,7 +85,7 @@ Be specific to this brand. No generic filler. Make it sting.`;
   try {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 700,
+      max_tokens: 900,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userContent }],
     });
@@ -104,6 +110,16 @@ Be specific to this brand. No generic filler. Make it sting.`;
     }
 
     roast.score = Math.max(1, Math.min(10, Math.round(roast.score)));
+
+    // Validate and clamp category scores, provide defaults if missing
+    if (!roast.categoryScores || typeof roast.categoryScores !== "object") {
+      roast.categoryScores = { logo: roast.score, typography: roast.score, color: roast.score, voice: roast.score, consistency: roast.score };
+    } else {
+      const cs = roast.categoryScores;
+      for (const key of ["logo", "typography", "color", "voice", "consistency"] as const) {
+        cs[key] = Math.max(1, Math.min(10, Math.round(Number(cs[key]) || roast.score)));
+      }
+    }
 
     return NextResponse.json(roast);
   } catch (err) {

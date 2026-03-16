@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Tag, Link2, Flame, X, CheckCircle2, AlertCircle, Download, Lock, ArrowRight, UploadCloud } from "lucide-react";
+import { Tag, Link2, Flame, X, CheckCircle2, AlertCircle, Printer, Lock, ArrowRight, UploadCloud } from "lucide-react";
 import Window from "./Window";
+import ReceiptCard from "./ReceiptCard";
 import type { RoastData } from "@/lib/types";
 
 type Mode = "idle" | "loading" | "result";
@@ -69,6 +70,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
   const [url, setUrl]           = useState("");
   const [roastData, setRoastData] = useState<RoastData | null>(null);
   const [error, setError]       = useState<string | null>(null);
+  const [receiptMeta, setReceiptMeta] = useState<{ id: string; date: string; time: string }>({ id: "", date: "", time: "" });
   const [uploadedFile, setUploadedFile] = useState<{ name: string; data: string; mediaType: string } | null>(null);
   const [fileError, setFileError]       = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -153,6 +155,12 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
       const roastResult = { ...data, brandName: brandName.trim() };
       setRoastData(roastResult);
+      const now = new Date();
+      setReceiptMeta({
+        id: String(Date.now()).slice(-8).replace(/(.{4})/, "$1-"),
+        date: now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
+        time: now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
+      });
       setMode("result");
       saveToHistory(roastResult);
     } catch (err) {
@@ -166,9 +174,19 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     setDownloading(true);
     try {
       const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: "#FFFFFF", logging: false });
+      // Capture the full-size receipt (1080px wide) at scale 1
+      const el = cardRef.current;
+      const canvas = await html2canvas(el, {
+        scale: 1,
+        backgroundColor: "#F9F6F0",
+        logging: false,
+        useCORS: true,
+        width: 1080,
+        height: el.scrollHeight,
+        windowWidth: 1080,
+      });
       const link = document.createElement("a");
-      link.download = `roast-${roastData.brandName.toLowerCase().replace(/\s+/g, "-")}.png`;
+      link.download = `receipt-${roastData.brandName.toLowerCase().replace(/\s+/g, "-")}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } finally {
@@ -176,7 +194,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     }
   };
 
-  const resetToForm = () => { setMode("idle"); setRoastData(null); setBrandName(""); setUrl(""); setUploadedFile(null); setFileError(null); };
+  const resetToForm = () => { setMode("idle"); setRoastData(null); setBrandName(""); setUrl(""); setUploadedFile(null); setFileError(null); setReceiptMeta({ id: "", date: "", time: "" }); };
 
   return (
     <Window
@@ -404,41 +422,34 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
             </p>
             <p className="font-sans text-sm text-[#1A1A1A] leading-relaxed mb-6">{roastData.verdict}</p>
 
-            {/* Share card (downloadable) */}
+            {/* Thermal Receipt Card */}
             <div className="border-t border-black/[0.06] pt-5 mb-6">
               <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B9B9B] mb-3">
-                Shareable Card
+                Download Receipt
               </p>
+
+              {/* Scaled preview */}
               <div
-                ref={cardRef}
                 style={{
-                  background: "linear-gradient(135deg, #FDFCFA 0%, #F0EBE3 100%)",
-                  borderRadius: "12px",
-                  padding: "22px",
-                  border: "1px solid rgba(0,0,0,0.07)",
+                  width: "400px",
+                  height: "500px",
+                  overflow: "hidden",
                   position: "relative",
-                  fontFamily: "system-ui, sans-serif",
-                  marginBottom: "10px",
+                  borderRadius: "4px",
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  marginBottom: "14px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
                 }}
               >
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", backgroundColor: scoreColor(roastData.score), borderRadius: "12px 12px 0 0" }} />
-                <p style={{ fontSize: "8px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#9B9B9B", marginBottom: "10px" }}>ROASTMYBRAND.WTF</p>
-                <p style={{ fontSize: "1rem", fontWeight: 700, color: "#1A1A1A", marginBottom: "4px" }}>{roastData.brandName}</p>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "3rem", fontWeight: 900, lineHeight: 1, color: scoreColor(roastData.score) }}>{roastData.score}</span>
-                  <span style={{ fontSize: "1rem", fontWeight: 700, color: "#C8C8C8" }}>/10</span>
+                <div style={{ transform: "scale(0.3704)", transformOrigin: "top left" }}>
+                  <ReceiptCard
+                    ref={cardRef}
+                    data={roastData}
+                    receiptId={receiptMeta.id}
+                    date={receiptMeta.date}
+                    time={receiptMeta.time}
+                  />
                 </div>
-                <p style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#3A3A3A", fontStyle: "italic", lineHeight: 1.4, marginBottom: "10px" }}>
-                  &ldquo;{roastData.headline}&rdquo;
-                </p>
-                <div style={{ borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "10px" }}>
-                  {roastData.whatsBroken.slice(0, 3).map((item, i) => (
-                    <p key={i} style={{ fontFamily: "monospace", fontSize: "0.6rem", color: "#6B6B6B", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      <span style={{ color: "#FF3B30", marginRight: "5px" }}>✕</span>{item}
-                    </p>
-                  ))}
-                </div>
-                <p style={{ position: "absolute", bottom: "14px", right: "16px", fontSize: "7px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C0C0C0" }}>roastmybrand.wtf</p>
               </div>
 
               <div className="flex items-center gap-3">
@@ -447,12 +458,15 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                   disabled={downloading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-1.5 glass border border-black/[0.08] text-[#1A1A1A] font-sans font-semibold text-xs px-4 py-2.5 rounded-lg disabled:opacity-40"
+                  className="flex items-center gap-2 bg-[#1A1A1A] text-white font-sans font-semibold text-xs px-5 py-2.5 rounded-lg disabled:opacity-40 shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
                 >
-                  <Download size={12} />
-                  {downloading ? "Generating…" : "Download Card"}
+                  <Printer size={12} />
+                  {downloading ? "Generating…" : "Download Receipt"}
                 </motion.button>
-                <button onClick={resetToForm} className="font-sans text-xs text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors">
+                <div className="flex flex-col">
+                  <span className="font-sans text-[10px] text-[#9B9B9B]">Perfect for Instagram · 1080×1350px</span>
+                </div>
+                <button onClick={resetToForm} className="font-sans text-xs text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors ml-auto">
                   ← Roast another
                 </button>
               </div>

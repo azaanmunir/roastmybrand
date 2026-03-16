@@ -2,7 +2,7 @@
 
 import MacOSDock from "@/components/ui/mac-os-dock";
 
-type DockIconId = "roast" | "terminal" | "history" | "wallpapers" | "pricing" | "contact";
+type DockIconId = "roast" | "terminal" | "history" | "wallpapers" | "pricing" | "contact" | "liveroasts";
 
 interface DockProps {
   onIconClick: (id: DockIconId) => void;
