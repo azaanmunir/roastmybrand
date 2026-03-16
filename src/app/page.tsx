@@ -138,6 +138,7 @@ export default function Page() {
     .map(([id]) => id);
 
   // Render mobile layout for screens under 768px
+  if (!mounted) return null;
   if (isMobile) return <MobileLayout />;
 
   return (
