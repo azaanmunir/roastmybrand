@@ -61,4 +61,4 @@ export const WALLPAPERS: Wallpaper[] = [
   },
 ];
 
-export const DEFAULT_WALLPAPER_ID = "duck";
+export const DEFAULT_WALLPAPER_ID = "sonoma";
