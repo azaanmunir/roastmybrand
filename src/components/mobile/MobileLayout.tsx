@@ -81,7 +81,7 @@ function MobileMenuBar() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4"
+      className="fixed top-0 left-0 right-0 z-[300] flex items-center justify-between px-4"
       style={{ ...GLASS_PANEL, height: "44px" }}
     >
       {/* Apple logo */}
@@ -136,14 +136,14 @@ function MobileBottomSheet({
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[90]"
+            className="fixed inset-0 z-[210]"
             style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
             onClick={onClose}
           />
           <motion.div
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 38 }}
-            className="fixed bottom-0 left-0 right-0 z-[91] bg-white overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 z-[211] bg-white overflow-hidden"
             style={{ height: "85vh", borderRadius: "20px 20px 0 0" }}
           >
             <div className="flex justify-center pt-3 pb-2">
@@ -606,13 +606,16 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[80] flex items-center justify-around"
+      className="fixed bottom-0 left-0 right-0 z-[200] flex items-center justify-around"
       style={{
-        ...GLASS_PANEL,
-        height: "72px",
-        paddingBottom: "env(safe-area-inset-bottom)",
-        borderTop: "1px solid rgba(255,255,255,0.6)",
+        background: "rgba(255,255,255,0.75)",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+        borderTop: "1px solid rgba(255,255,255,0.8)",
+        boxShadow: "0 -4px 24px rgba(0,0,0,0.12)",
         borderRadius: "16px 16px 0 0",
+        height: "calc(64px + env(safe-area-inset-bottom))",
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
       {DOCK_APPS.map((app) => (
@@ -767,10 +770,7 @@ export default function MobileLayout() {
     : "RoastMyBrand.wtf — New Roast";
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
-
-      {/* ── Wallpaper background ── */}
-      <div className="absolute inset-0" style={bgStyle} />
+    <div className="fixed inset-0" style={{ ...bgStyle, overflow: "hidden" }}>
 
       {/* ── Menu bar ── */}
       <MobileMenuBar />
@@ -779,7 +779,7 @@ export default function MobileLayout() {
       <div
         ref={contentRef}
         className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-        style={{ paddingTop: "52px", paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
+        style={{ paddingTop: "52px", paddingBottom: "calc(84px + env(safe-area-inset-bottom))" }}
       >
         <div className="px-4 py-3 space-y-4">
 
@@ -842,7 +842,7 @@ export default function MobileLayout() {
                     ) : (
                       <button type="button" onClick={() => fileInputRef.current?.click()}
                         className="w-full h-16 rounded-[10px] flex flex-col items-center justify-center gap-1"
-                        style={{ border: "1.5px dashed #D0D0D0" }}>
+                        style={{ border: "1.5px dashed #AAAAAA", background: "rgba(0,0,0,0.03)" }}>
                         <span className="font-sans text-[13px] text-[#999]">📎 Attach brand assets (optional)</span>
                         <span className="font-sans text-[11px] text-[#BBBBBB]">PNG, JPG, PDF up to 15MB</span>
                       </button>
