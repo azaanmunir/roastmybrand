@@ -11,6 +11,10 @@ import TerminalWindow from "@/components/windows/TerminalWindow";
 import WallpapersWindow from "@/components/windows/WallpapersWindow";
 import HistoryWindow from "@/components/windows/HistoryWindow";
 import ContactWindow from "@/components/windows/ContactWindow";
+import PortfolioWindow from "@/components/windows/PortfolioWindow";
+import HallOfShameWindow from "@/components/windows/HallOfShameWindow";
+import ChecklistWindow from "@/components/windows/ChecklistWindow";
+import DesktopFolder from "@/components/desktop/DesktopFolder";
 import { WALLPAPERS, DEFAULT_WALLPAPER_ID } from "@/lib/wallpapers";
 
 type WindowId = "roast" | "liveroasts" | "terminal" | "wallpapers" | "history" | "contact";
@@ -168,6 +172,9 @@ export default function Page() {
   const [aboutOpen, setAboutOpen]       = useState(false);
   const [resetKey, setResetKey]         = useState(0);
   const toastTimer                      = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showPortfolio, setShowPortfolio]     = useState(false);
+  const [showHallOfShame, setShowHallOfShame] = useState(false);
+  const [showChecklist, setShowChecklist]     = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -269,6 +276,28 @@ export default function Page() {
         <MenuBar onMenuAction={handleMenuAction} />
 
         <div className="absolute inset-0 pt-7 pb-24">
+
+          {/* ── Desktop Folders ── */}
+          {mounted && (
+            <>
+              <DesktopFolder
+                label="Azaan's Portfolio"
+                position={{ x: 40, y: 80 }}
+                onClick={() => setShowPortfolio(true)}
+              />
+              <DesktopFolder
+                label="Hall of Shame"
+                position={{ x: 40, y: 200 }}
+                onClick={() => setShowHallOfShame(true)}
+              />
+              <DesktopFolder
+                label="Free Checklist"
+                position={{ x: 40, y: 320 }}
+                onClick={() => setShowChecklist(true)}
+              />
+            </>
+          )}
+
           {mounted && windows.roast.isOpen && !windows.roast.isMinimized && (
             <RoastWindow
               zIndex={windows.roast.zIndex}
@@ -342,6 +371,45 @@ export default function Page() {
               onMinimize={() => minimizeWindow("contact")}
               initialX={positions.contact.x}
               initialY={positions.contact.y}
+            />
+          )}
+
+          {mounted && showPortfolio && (
+            <PortfolioWindow
+              zIndex={topZ + 1}
+              isActive
+              onFocus={() => {}}
+              onClose={() => setShowPortfolio(false)}
+              onMinimize={() => setShowPortfolio(false)}
+              initialX={Math.max(20, (vw - 500) / 2)}
+              initialY={100}
+              onOpenContact={() => { openWindow("contact"); setShowPortfolio(false); }}
+            />
+          )}
+
+          {mounted && showHallOfShame && (
+            <HallOfShameWindow
+              zIndex={topZ + 1}
+              isActive
+              onFocus={() => {}}
+              onClose={() => setShowHallOfShame(false)}
+              onMinimize={() => setShowHallOfShame(false)}
+              initialX={Math.max(20, (vw - 420) / 2)}
+              initialY={100}
+              onOpenRoast={() => { openWindow("roast"); setShowHallOfShame(false); }}
+            />
+          )}
+
+          {mounted && showChecklist && (
+            <ChecklistWindow
+              zIndex={topZ + 1}
+              isActive
+              onFocus={() => {}}
+              onClose={() => setShowChecklist(false)}
+              onMinimize={() => setShowChecklist(false)}
+              initialX={Math.max(20, (vw - 420) / 2)}
+              initialY={80}
+              onOpenContact={() => { openWindow("contact"); setShowChecklist(false); }}
             />
           )}
         </div>
