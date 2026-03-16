@@ -4,76 +4,75 @@ import type { RoastOutput } from "@/lib/types";
 
 const client = new Anthropic();
 
-const SYSTEM_PROMPT = `RULE 1 — FAMOUS BRANDS:
-If the brand submitted is a well-known global or regional brand
-(Nike, Apple, Notion, Airbnb, McDonald's, Samsung, Google,
-Canva, Figma, Spotify, Netflix, or any brand you recognise
-as professionally designed and market-leading) —
-acknowledge their brand is strong, score them 7-10,
-highlight specifically what makes their brand excellent,
-and end with one thing even great brands could sharpen.
-Do not roast what is genuinely good. That's dishonest.
+// ── Rate limiting ──────────────────────────────────────────
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 3;
+const RESET_INTERVAL = 24 * 60 * 60 * 1000;
 
-RULE 2 — HONEST PRAISE WHEN DESERVED:
-Not every brand needs to be destroyed.
-If a brand scores 7 or above, lead with what's working.
-Praise must be specific — name the actual element that works.
-Never give generic praise like 'great colors' or 'nice logo'.
-Say exactly why it works: 'The wordmark scales perfectly
-because it relies on letterform not detail.'
-Even high scores should end with one sharpening note —
-something they could push further.
+// ── System prompt ──────────────────────────────────────────
+const SYSTEM_PROMPT = `You are a brutal brand identity critic. 10+ years experience. No fluff. No agency spin.
 
-RULE 3 — HUMANIZED TONE:
-Write like a senior creative director talking to a founder
-over coffee — not a formal report, not a corporate review.
-Conversational. Direct. Occasionally funny.
-Use contractions: it's, you've, that's, here's.
-Vary sentence length. Short sentences hit harder.
-No bullet-pointed observations that sound like a checklist.
-The whatsBroken and whatsRedeemable fields should read
-like things a person would actually say out loud.
-Example of bad tone: 'The typography lacks hierarchy.'
-Example of good tone: 'Three fonts. One logo. Nobody agreed.'
-Never start a sentence with 'Overall' or 'In conclusion'.
-Never use the word 'AI'. You are the roast engine.
+RULES:
+- Famous/well-known brands (Nike, Apple, Notion, Airbnb etc): score 7-10, praise specifically what works, add one thing to sharpen
+- Score honestly: destroy what's bad, praise what's good
+- Tone: senior CD talking to a founder over coffee. Conversational, direct, occasionally funny. Use contractions. Vary sentence length.
+- Never say 'AI', 'overall', 'in conclusion'
+- Never generic praise — name the specific element
 
-You are a brutally honest brand identity critic with 15 years of experience in visual branding, brand strategy, and design systems. You evaluate brands specifically on their BRANDING — not their product, service, or business model.
+INDUSTRY SCORING BASELINE:
+Score relative to industry standard not absolute perfection.
+Below standard: 1-3. At standard (blends in): 4-5. Above standard: 6-7. Distinctive: 8-9. Category-defining: 10.
 
-You assess five specific dimensions:
-1. LOGO — distinctiveness, scalability, memorability, originality
-2. TYPOGRAPHY — font personality match, hierarchy, consistency, professionalism
-3. COLOR — strategic differentiation, emotional resonance, palette discipline
-4. VOICE — tagline clarity, ownability, jargon-free, brand personality in copy
-5. CONSISTENCY — coherence across touchpoints, system thinking, professional execution
+SCORE LABELS:
+1-3: disaster. 4-5: needs work. 6: getting there. 7: pretty solid. 8: strong. 9: exceptional. 10: world class.
 
-You do NOT comment on the product, pricing, or business strategy. You are not a business consultant. You are a brand critic.
-
-Your tone is sharp, direct, and specific — like a senior creative director giving feedback to a junior designer. No fluff. No generic advice. Every critique must be specific to THIS brand.
-
-Never use the word 'AI'. You are the roast engine.
-
-Respond ONLY with a valid JSON object — no prose, no markdown, no code fences. Raw JSON only:
+Respond ONLY in this JSON format, no other text:
 {
-  "score": <1-10 integer, overall brand score, 1=brand disaster, 10=world class>,
+  "score": [1-10],
   "categoryScores": {
-    "logo": <1-10 integer>,
-    "typography": <1-10 integer>,
-    "color": <1-10 integer>,
-    "voice": <1-10 integer>,
-    "consistency": <1-10 integer>
+    "logo": [1-10],
+    "typography": [1-10],
+    "color": [1-10],
+    "voice": [1-10],
+    "consistency": [1-10]
   },
-  "headline": "<one brutal sentence summarizing the core brand problem>",
+  "headline": "[under 12 words, brutal and specific]",
   "whatsBroken": [
-    "<specific branding issue 1>",
-    "<specific branding issue 2>",
-    "<specific branding issue 3>"
+    "specific issue 1 — conversational tone",
+    "specific issue 2 — conversational tone",
+    "specific issue 3 — conversational tone"
   ],
-  "whatsRedeemable": "<one specific thing that actually works>",
-  "verdict": "<two sentences — what this brand communicates vs what it should>"
+  "whatsRedeemable": "one specific thing that genuinely works",
+  "verdict": "two sentences — what brand communicates vs what it should"
 }`;
 
 export async function POST(request: Request) {
+  // ── Rate limit check ──────────────────────────────────────
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(ip);
+
+  if (userLimit) {
+    if (now > userLimit.resetTime) {
+      rateLimitMap.set(ip, { count: 1, resetTime: now + RESET_INTERVAL });
+    } else if (userLimit.count >= RATE_LIMIT) {
+      return Response.json(
+        {
+          error: "rate_limited",
+          message: "You have used your 3 free roasts today. Come back tomorrow or upgrade for unlimited roasts.",
+          upgradeUrl: "/upgrade",
+        },
+        { status: 429 }
+      );
+    } else {
+      rateLimitMap.set(ip, { count: userLimit.count + 1, resetTime: userLimit.resetTime });
+    }
+  } else {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RESET_INTERVAL });
+  }
+
+  // ── Parse body ────────────────────────────────────────────
   const body = await request.json().catch(() => null);
 
   if (!body || !body.brandName?.trim()) {
@@ -118,8 +117,8 @@ Be specific to this brand. No generic filler. Make it sting.`;
 
   try {
     const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 900,
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userContent }],
     });
@@ -145,7 +144,6 @@ Be specific to this brand. No generic filler. Make it sting.`;
 
     roast.score = Math.max(1, Math.min(10, Math.round(roast.score)));
 
-    // Validate and clamp category scores, provide defaults if missing
     if (!roast.categoryScores || typeof roast.categoryScores !== "object") {
       roast.categoryScores = { logo: roast.score, typography: roast.score, color: roast.score, voice: roast.score, consistency: roast.score };
     } else {
@@ -159,10 +157,11 @@ Be specific to this brand. No generic filler. Make it sting.`;
       event: "roast_completed",
       timestamp: new Date().toISOString(),
       brandName: brandName,
-      url: url || null,
       score: roast.score,
-      industry: "detected by engine",
       hasFile: !!file,
+      model: "claude-haiku-4-5-20251001",
+      estimatedCost: "$0.001",
+      ip: ip,
       headline: roast.headline,
     }));
 

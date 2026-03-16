@@ -655,6 +655,7 @@ export default function MobileLayout() {
 
   /* ── Roast form ── */
   const [mode, setMode]           = useState<"idle" | "loading" | "result">("idle");
+  const [rateLimited, setRateLimited] = useState(false);
   const [brandName, setBrandName] = useState("");
   const [url, setUrl]             = useState("");
   const [uploadedFile, setUploadedFile] = useState<{ name: string; data: string; mediaType: string } | null>(null);
@@ -716,6 +717,11 @@ export default function MobileLayout() {
         }),
       });
       const data = await res.json();
+      if (data.error === "rate_limited") {
+        setRateLimited(true);
+        setMode("idle");
+        return;
+      }
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
       const roastResult = { ...data, brandName: brandName.trim() };
       const now = new Date();
@@ -810,8 +816,31 @@ export default function MobileLayout() {
 
             <AnimatePresence mode="wait">
 
+              {/* ── RATE LIMITED ── */}
+              {rateLimited && (
+                <motion.div key="ratelimit" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="p-5 flex flex-col items-center text-center">
+                  <div style={{ fontSize: "48px", lineHeight: 1 }} className="mb-4">🔥</div>
+                  <h2 className="font-sans font-extrabold text-[20px] text-[#1A1A1A] mb-2">
+                    You&rsquo;ve used your 3 free roasts today.
+                  </h2>
+                  <p className="font-sans text-[14px] text-[#6B6B6B] mb-5">
+                    Come back tomorrow for more brutality.
+                  </p>
+                  <div className="w-full h-px bg-black/[0.07] mb-5" />
+                  <a href="/upgrade"
+                    className="flex items-center justify-center w-full h-[50px] bg-[#1A1A1A] text-white font-sans font-semibold rounded-[12px] mb-3"
+                    style={{ fontSize: "15px" }}>
+                    Get Unlimited Roasts — $7
+                  </a>
+                  <p className="font-sans text-[12px] text-[#AAAAAA]">
+                    Or wait 24 hours for 3 more free roasts.
+                  </p>
+                </motion.div>
+              )}
+
               {/* ── FORM ── */}
-              {mode === "idle" && (
+              {!rateLimited && mode === "idle" && (
                 <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25 }} className="p-5">
                   <h1 className="font-display text-[#1A1A1A] leading-tight mb-1" style={{ fontSize: "28px", fontWeight: 800 }}>

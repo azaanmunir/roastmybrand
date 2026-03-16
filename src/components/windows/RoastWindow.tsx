@@ -52,6 +52,7 @@ interface Props {
 
 export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY, resetKey }: Props) {
   const [mode, setMode]         = useState<Mode>("idle");
+  const [rateLimited, setRateLimited] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
   const [wordVisible, setWordVisible] = useState(true);
 
@@ -152,6 +153,11 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
         }),
       });
       const data = await res.json();
+      if (data.error === "rate_limited") {
+        setRateLimited(true);
+        setMode("idle");
+        return;
+      }
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
       const roastResult = { ...data, brandName: brandName.trim() };
       setRoastData(roastResult);
@@ -210,8 +216,38 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     >
       <AnimatePresence mode="wait">
 
+        {/* ── RATE LIMITED ── */}
+        {rateLimited && (
+          <motion.div
+            key="ratelimit"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="p-7 flex flex-col items-center text-center"
+          >
+            <div className="text-5xl mb-4">🔥</div>
+            <h2 className="font-sans font-extrabold text-[20px] text-[#1A1A1A] mb-2">
+              You&rsquo;ve used your 3 free roasts today.
+            </h2>
+            <p className="font-sans text-[14px] text-[#6B6B6B] mb-5">
+              Come back tomorrow for more brutality.
+            </p>
+            <div className="w-full h-px bg-black/[0.07] mb-5" />
+            <motion.a
+              href="/upgrade"
+              whileHover={{ scale: 1.015 }}
+              whileTap={{ scale: 0.97 }}
+              className="flex items-center justify-center w-full py-3 bg-[#1A1A1A] text-white font-sans font-semibold text-sm rounded-lg mb-3"
+            >
+              Get Unlimited Roasts — $7
+            </motion.a>
+            <p className="font-sans text-[12px] text-[#AAAAAA]">
+              Or wait 24 hours for 3 more free roasts.
+            </p>
+          </motion.div>
+        )}
+
         {/* ── FORM ── */}
-        {mode === "idle" && (
+        {!rateLimited && mode === "idle" && (
           <motion.div
             key="form"
             initial={{ opacity: 0 }}
