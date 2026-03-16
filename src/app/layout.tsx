@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, JetBrains_Mono, Courier_Prime } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,12 @@ const courierPrime = Courier_Prime({
   style: ["normal", "italic"],
   variable: "--font-courier-prime",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "RoastMyBrand.wtf — Your brand deserves the truth",
