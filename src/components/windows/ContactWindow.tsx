@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Send, MapPin } from "lucide-react";
+import { Calendar, Send, MapPin, CheckCircle2, AlertCircle } from "lucide-react";
 import Window from "./Window";
 
 interface Props {
@@ -21,19 +21,23 @@ export default function ContactWindow({
   const [name, setName]       = useState("");
   const [email, setEmail]     = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus]   = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(
-      `Brand Inquiry from RoastMyBrand.wtf — ${name}`
-    );
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\n---\nSent from roastmybrand.wtf`
-    );
-    window.open(
-      `mailto:azaanmunirpk@gmail.com?subject=${subject}&body=${body}`,
-      '_blank'
-    );
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setStatus("sent");
+      setName(""); setEmail(""); setMessage("");
+    } catch {
+      setStatus("error");
+    }
   };
 
   const inputCls = "w-full rounded-lg px-3 py-2.5 font-sans text-[13px] text-[#1A1A1A] placeholder-[rgba(0,0,0,0.28)] focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition-all duration-200";
@@ -87,45 +91,72 @@ export default function ContactWindow({
         </div>
 
         {/* Section 2 — Quick message */}
-        <form onSubmit={handleSend} className="space-y-2.5">
-          <h3 className="font-sans text-[13px] font-semibold text-[#1A1A1A]">Send a message</h3>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className={inputCls}
-            style={inputStyle}
-          />
-          <input
-            type="email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className={inputCls}
-            style={inputStyle}
-          />
-          <textarea
-            placeholder="What can I help you with?"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-            rows={4}
-            className={`${inputCls} resize-none`}
-            style={inputStyle}
-          />
-          <motion.button
-            type="submit"
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.97 }}
-            className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#1A1A1A] text-white font-sans text-[13px] font-semibold rounded-lg hover:opacity-85 transition-opacity"
+        {status === "sent" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-8 text-center gap-3"
           >
-            <Send size={12} />
-            Send →
-          </motion.button>
-        </form>
+            <CheckCircle2 size={32} className="text-[#34C759]" />
+            <p className="font-sans text-[14px] font-semibold text-[#1A1A1A]">Message sent!</p>
+            <p className="font-sans text-[12px] text-[#9B9B9B]">I&apos;ll get back to you soon.</p>
+            <button
+              onClick={() => setStatus("idle")}
+              className="font-sans text-[12px] text-accent hover:opacity-70 transition-opacity mt-1"
+            >
+              Send another →
+            </button>
+          </motion.div>
+        ) : (
+          <form onSubmit={handleSend} className="space-y-2.5">
+            <h3 className="font-sans text-[13px] font-semibold text-[#1A1A1A]">Send a message</h3>
+            <input
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className={inputCls}
+              style={inputStyle}
+            />
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={inputCls}
+              style={inputStyle}
+            />
+            <textarea
+              placeholder="What can I help you with?"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+              rows={4}
+              className={`${inputCls} resize-none`}
+              style={inputStyle}
+            />
+
+            {status === "error" && (
+              <div className="flex items-center gap-1.5 font-sans text-[12px] text-[#FF3B30]">
+                <AlertCircle size={12} />
+                Failed to send — try again.
+              </div>
+            )}
+
+            <motion.button
+              type="submit"
+              disabled={status === "sending"}
+              whileHover={{ scale: 1.015 }}
+              whileTap={{ scale: 0.97 }}
+              className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#1A1A1A] text-white font-sans text-[13px] font-semibold rounded-lg hover:opacity-85 transition-opacity disabled:opacity-50"
+            >
+              <Send size={12} />
+              {status === "sending" ? "Sending…" : "Send →"}
+            </motion.button>
+          </form>
+        )}
 
         {/* Footer */}
         <div className="pt-1 border-t border-black/[0.06]">
