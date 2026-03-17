@@ -14,18 +14,21 @@ interface RoastEntry {
 }
 
 const MOCK_ROASTS: Omit<RoastEntry, "id">[] = [
-  { brand: "A***e C**p",        score: 3,  emoji: "💀", age: "2m ago" },
-  { brand: "B****r F****s",     score: 6,  emoji: "🔥", age: "5m ago" },
-  { brand: "S***p St***o",      score: 2,  emoji: "☠️", age: "8m ago" },
-  { brand: "T***h S*****t",     score: 7,  emoji: "✅", age: "11m ago" },
-  { brand: "C***c T**e",        score: 4,  emoji: "🥴", age: "14m ago" },
-  { brand: "N***t V****n",      score: 1,  emoji: "💀", age: "17m ago" },
-  { brand: "F***d A***a",       score: 5,  emoji: "🔥", age: "22m ago" },
-  { brand: "B***d S***o",       score: 8,  emoji: "✅", age: "26m ago" },
-  { brand: "P***e L***s",       score: 3,  emoji: "☠️", age: "30m ago" },
-  { brand: "G***w F***t",       score: 6,  emoji: "🔥", age: "35m ago" },
-  { brand: "Z***h M***a",       score: 2,  emoji: "💀", age: "41m ago" },
-  { brand: "C***o B***d",       score: 9,  emoji: "🏆", age: "48m ago" },
+  { brand: "K***a",                    score: 3,  emoji: "💀", age: "2m ago" },
+  { brand: "B****r F****s",            score: 6,  emoji: "🔥", age: "5m ago" },
+  { brand: "N**h S**r D**n",           score: 2,  emoji: "☠️", age: "8m ago" },
+  { brand: "T***h",                    score: 7,  emoji: "✅", age: "11m ago" },
+  { brand: "C***c T**e",              score: 4,  emoji: "🥴", age: "14m ago" },
+  { brand: "F***x",                    score: 1,  emoji: "💀", age: "17m ago" },
+  { brand: "B**g B***d C**p",          score: 5,  emoji: "🔥", age: "22m ago" },
+  { brand: "V***o",                    score: 8,  emoji: "✅", age: "26m ago" },
+  { brand: "P***e L***s",              score: 3,  emoji: "☠️", age: "30m ago" },
+  { brand: "S***p St***o",             score: 6,  emoji: "🔥", age: "35m ago" },
+  { brand: "Z***h",                    score: 2,  emoji: "💀", age: "41m ago" },
+  { brand: "C***o B***d & Co",         score: 9,  emoji: "🏆", age: "48m ago" },
+  { brand: "A***e C**p",               score: 3,  emoji: "💀", age: "52m ago" },
+  { brand: "O***x",                    score: 5,  emoji: "🔥", age: "57m ago" },
+  { brand: "R**d L***f D**n",          score: 4,  emoji: "🥴", age: "1h ago" },
 ];
 
 const scoreColor  = (s: number) => s <= 3 ? "#FF3B30" : s <= 6 ? "#FF9500" : "#34C759";

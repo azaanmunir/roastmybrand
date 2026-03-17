@@ -17,12 +17,15 @@ const CYCLING_WORDS = [
 ];
 
 const MOCK_ROASTS = [
-  { brand: "A***e C**p",    score: 3, emoji: "💀", age: "2m ago" },
-  { brand: "B****r F****s", score: 6, emoji: "🔥", age: "5m ago" },
-  { brand: "S***p St***o",  score: 2, emoji: "☠️", age: "8m ago" },
-  { brand: "T***h S*****t", score: 7, emoji: "✅", age: "11m ago" },
-  { brand: "C***c T**e",    score: 4, emoji: "🥴", age: "14m ago" },
-  { brand: "N***t V****n",  score: 1, emoji: "💀", age: "17m ago" },
+  { brand: "K***a",             score: 3, emoji: "💀", age: "2m ago" },
+  { brand: "B****r F****s",     score: 6, emoji: "🔥", age: "5m ago" },
+  { brand: "N**h S**r D**n",    score: 2, emoji: "☠️", age: "8m ago" },
+  { brand: "T***h",             score: 7, emoji: "✅", age: "11m ago" },
+  { brand: "C***c T**e",        score: 4, emoji: "🥴", age: "14m ago" },
+  { brand: "F***x",             score: 1, emoji: "💀", age: "17m ago" },
+  { brand: "B**g B***d C**p",   score: 5, emoji: "🔥", age: "22m ago" },
+  { brand: "V***o",             score: 8, emoji: "✅", age: "26m ago" },
+  { brand: "R**d L***f D**n",   score: 4, emoji: "🥴", age: "30m ago" },
 ];
 
 const scoreColor = (s: number) =>
