@@ -613,31 +613,57 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[200] flex items-center justify-around"
+      className="fixed z-[200] left-1/2 -translate-x-1/2"
       style={{
-        background: "rgba(255,255,255,0.75)",
-        backdropFilter: "blur(24px) saturate(180%)",
-        WebkitBackdropFilter: "blur(24px) saturate(180%)",
-        borderTop: "1px solid rgba(255,255,255,0.8)",
-        boxShadow: "0 -4px 24px rgba(0,0,0,0.12)",
-        borderRadius: "16px 16px 0 0",
-        height: "calc(64px + env(safe-area-inset-bottom))",
-        paddingBottom: "env(safe-area-inset-bottom)",
+        bottom: "calc(16px + env(safe-area-inset-bottom))",
+        boxShadow: "0 6px 6px rgba(0,0,0,0.2), 0 0 20px rgba(0,0,0,0.1)",
+        borderRadius: 28,
       }}
     >
-      {DOCK_APPS.map((app) => (
-        <button
-          key={app.id}
-          onClick={() => handlePress(app.id)}
-          className="flex flex-col items-center gap-1 px-3"
-          style={{ transform: pressed === app.id ? "scale(1.1)" : "scale(1)", transition: "transform 0.15s ease" }}
-        >
-          <img src={app.icon} alt={app.name} className="w-10 h-10 rounded-xl" style={{ objectFit: "contain" }} />
-          <span className="font-sans text-[10px] text-[#1A1A1A]" style={{ letterSpacing: "0.02em" }}>
-            {app.name}
-          </span>
-        </button>
-      ))}
+      {/* Glass layer 1 — distortion + blur */}
+      <div
+        className="absolute inset-0 z-0 overflow-hidden"
+        style={{
+          borderRadius: 28,
+          backdropFilter: "blur(3px)",
+          filter: "url(#glass-distortion)",
+          isolation: "isolate",
+        }}
+      />
+      {/* Glass layer 2 — white tint */}
+      <div
+        className="absolute inset-0 z-10"
+        style={{ borderRadius: 28, background: "rgba(255,255,255,0.25)" }}
+      />
+      {/* Glass layer 3 — inner highlight */}
+      <div
+        className="absolute inset-0 z-20 overflow-hidden"
+        style={{
+          borderRadius: 28,
+          boxShadow: "inset 2px 2px 1px 0 rgba(255,255,255,0.5), inset -1px -1px 1px 1px rgba(255,255,255,0.5)",
+        }}
+      />
+
+      {/* Icons */}
+      <div className="relative z-30 flex items-end gap-1 px-3 py-2">
+        {DOCK_APPS.map((app) => (
+          <button
+            key={app.id}
+            onClick={() => handlePress(app.id)}
+            className="flex flex-col items-center gap-1 px-2"
+            style={{
+              transform: pressed === app.id ? "scale(1.15)" : "scale(1)",
+              transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={app.icon} alt={app.name} className="w-12 h-12 select-none" style={{ objectFit: "contain" }} />
+            <span className="font-sans text-[9px] text-[#1A1A1A] font-medium" style={{ letterSpacing: "0.02em" }}>
+              {app.name}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -795,7 +821,7 @@ export default function MobileLayout() {
       <div
         ref={contentRef}
         className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-        style={{ paddingTop: "52px", paddingBottom: "calc(84px + env(safe-area-inset-bottom))" }}
+        style={{ paddingTop: "52px", paddingBottom: "calc(100px + env(safe-area-inset-bottom))" }}
       >
         <div className="px-4 py-3 space-y-4">
 
