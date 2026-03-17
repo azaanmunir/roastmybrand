@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Tag, Link2, Flame, X, CheckCircle2, AlertCircle, Printer, Lock, ArrowRight, UploadCloud } from "lucide-react";
+import { Tag, Link2, Flame, X, CheckCircle2, AlertCircle, Printer, Lock, ArrowRight, UploadCloud, Share2 } from "lucide-react";
 import Window from "./Window";
 import ReceiptCard from "./ReceiptCard";
 import type { RoastData } from "@/lib/types";
@@ -70,6 +70,8 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
   const [brandName, setBrandName] = useState("");
   const [url, setUrl]           = useState("");
   const [roastData, setRoastData] = useState<RoastData | null>(null);
+  const [roastId, setRoastId]   = useState<string | null>(null);
+  const [copied, setCopied]     = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [receiptMeta, setReceiptMeta] = useState<{ id: string; date: string; time: string }>({ id: "", date: "", time: "" });
   const [uploadedFile, setUploadedFile] = useState<{ name: string; data: string; mediaType: string } | null>(null);
@@ -82,6 +84,8 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     setBrandName("");
     setUrl("");
     setRoastData(null);
+    setRoastId(null);
+    setCopied(false);
     setError(null);
     setUploadedFile(null);
     setFileError(null);
@@ -161,6 +165,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
       const roastResult = { ...data, brandName: brandName.trim() };
       setRoastData(roastResult);
+      if (data.roastId) setRoastId(data.roastId);
       const now = new Date();
       setReceiptMeta({
         id: String(Date.now()).slice(-8).replace(/(.{4})/, "$1-"),
@@ -200,7 +205,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     }
   };
 
-  const resetToForm = () => { setMode("idle"); setRoastData(null); setBrandName(""); setUrl(""); setUploadedFile(null); setFileError(null); setReceiptMeta({ id: "", date: "", time: "" }); };
+  const resetToForm = () => { setMode("idle"); setRoastData(null); setRoastId(null); setCopied(false); setBrandName(""); setUrl(""); setUploadedFile(null); setFileError(null); setReceiptMeta({ id: "", date: "", time: "" }); };
 
   return (
     <Window
@@ -488,7 +493,7 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <motion.button
                   onClick={handleDownload}
                   disabled={downloading}
@@ -499,13 +504,36 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
                   <Printer size={12} />
                   {downloading ? "Generating…" : "Download Receipt"}
                 </motion.button>
-                <div className="flex flex-col">
-                  <span className="font-sans text-[10px] text-[#9B9B9B]">Perfect for Instagram · 1080×1350px</span>
-                </div>
+
+                {roastId && (
+                  <motion.button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(`https://roastmybrand.wtf/roast/${roastId}`);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2500);
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 font-sans font-semibold text-xs px-5 py-2.5 rounded-lg transition-colors"
+                    style={{
+                      background: copied ? "#34C759" : "rgba(0,113,227,0.1)",
+                      color: copied ? "white" : "#0071E3",
+                    }}
+                  >
+                    {copied ? <CheckCircle2 size={12} /> : <Share2 size={12} />}
+                    {copied ? "Link Copied!" : "Share Roast"}
+                  </motion.button>
+                )}
+
                 <button onClick={resetToForm} className="font-sans text-xs text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors ml-auto">
                   ← Roast another
                 </button>
               </div>
+              {roastId && (
+                <p className="font-sans text-[10px] text-[#9B9B9B] mt-2">
+                  Public link: roastmybrand.wtf/roast/{roastId}
+                </p>
+              )}
             </div>
 
             {/* Improvement Roadmap */}

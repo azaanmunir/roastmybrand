@@ -13,6 +13,7 @@ export interface RoastOutput {
   whatsBroken: string[];
   whatsRedeemable: string;
   verdict: string;
+  roastId?: string;
 }
 
 export interface RoastData extends RoastOutput {
