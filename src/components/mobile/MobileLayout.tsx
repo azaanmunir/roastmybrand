@@ -735,11 +735,15 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
               transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
             }}
           >
-            {/* Fixed-size container ensures all icons render at identical dimensions */}
-            <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center select-none">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={app.icon} alt={app.name} className="w-full h-full" style={{ objectFit: "cover" }} />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={app.icon}
+              alt={app.name}
+              width={48}
+              height={48}
+              className="select-none"
+              style={{ width: 48, height: 48, objectFit: "contain" }}
+            />
             <span className="font-sans text-[9px] text-[#1A1A1A] font-medium" style={{ letterSpacing: "0.02em" }}>
               {app.name}
             </span>
