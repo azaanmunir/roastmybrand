@@ -6,6 +6,8 @@ interface DockApp {
   id: string;
   name: string;
   icon: string;
+  href?: string;
+  divider?: boolean;
 }
 
 interface MacOSDockProps {
@@ -53,11 +55,18 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
 
       {/* Icons */}
       <div className="relative z-30 flex items-end gap-2 px-3 py-2">
-        {apps.map((app) => (
+        {apps.map((app) => app.divider ? (
+          <div
+            key={app.id}
+            className="self-stretch flex items-center mx-1"
+          >
+            <div className="w-px h-10 rounded-full" style={{ background: "rgba(0,0,0,0.15)" }} />
+          </div>
+        ) : (
           <div
             key={app.id}
             className="relative flex flex-col items-center group/icon cursor-pointer"
-            onClick={() => onAppClick(app.id)}
+            onClick={() => app.href ? window.open(app.href, "_blank", "noopener noreferrer") : onAppClick(app.id)}
           >
             {/* Tooltip */}
             <div
