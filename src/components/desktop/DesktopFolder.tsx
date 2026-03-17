@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 const FOLDER_NORMAL = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 564.77 442.19" width="64" height="64">
@@ -25,11 +26,12 @@ export default function DesktopFolder({ label, onClick, position }: Props) {
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState(false);
   const lastClick = useRef(0);
+  const dragMoved = useRef(false);
 
   const handleClick = () => {
+    if (dragMoved.current) return;
     const now = Date.now();
     if (now - lastClick.current < 400) {
-      // double-click
       onClick();
       setSelected(false);
     } else {
@@ -39,8 +41,15 @@ export default function DesktopFolder({ label, onClick, position }: Props) {
   };
 
   return (
-    <div
-      style={{ position: "absolute", left: position.x, top: position.y, width: 80, cursor: "pointer", userSelect: "none" }}
+    <motion.div
+      drag
+      dragMomentum={false}
+      dragElastic={0}
+      initial={{ x: position.x, y: position.y }}
+      onDragStart={() => { dragMoved.current = true; setSelected(false); }}
+      onDragEnd={() => { setTimeout(() => { dragMoved.current = false; }, 50); }}
+      style={{ position: "absolute", left: 0, top: 0, width: 80, cursor: "grab", userSelect: "none", zIndex: selected ? 50 : 10 }}
+      whileDrag={{ cursor: "grabbing", zIndex: 100 }}
       onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -79,7 +88,7 @@ export default function DesktopFolder({ label, onClick, position }: Props) {
             textShadow: "0 1px 3px rgba(0,0,0,0.6)",
             background: selected ? "#0066CC" : "transparent",
             borderRadius: 3,
-            padding: selected ? "1px 4px" : "1px 4px",
+            padding: "1px 4px",
             transition: "all 0.15s ease",
             display: "inline-block",
             maxWidth: 76,
@@ -89,6 +98,6 @@ export default function DesktopFolder({ label, onClick, position }: Props) {
           {label}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 }
