@@ -394,74 +394,94 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
             transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             className="p-7"
           >
-            {/* Score */}
-            <div className="flex items-baseline gap-2 mb-1">
-              <span
-                className="font-display leading-none"
-                style={{ fontSize: "clamp(4rem,12vw,7rem)", color: scoreColor(roastData.score) }}
-              >
-                {roastData.score}
-              </span>
-              <span className="font-sans text-2xl text-black/20 font-semibold mb-1">/10</span>
-              <span
-                className="font-sans text-xs font-semibold px-2 py-0.5 rounded-full text-white mb-1 ml-1"
-                style={{ backgroundColor: scoreColor(roastData.score) }}
-              >
-                {scoreLabel(roastData.score)}
-              </span>
-            </div>
+            {/* Score + Category grid */}
+            <div className="flex gap-6 mb-6 items-start">
+              {/* Big score */}
+              <div className="shrink-0">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="font-display leading-none" style={{ fontSize: "clamp(4rem,10vw,6rem)", color: scoreColor(roastData.score) }}>
+                    {roastData.score}
+                  </span>
+                  <span className="font-sans text-xl text-black/20 font-semibold">/10</span>
+                </div>
+                <span className="font-sans text-[11px] font-semibold px-2.5 py-1 rounded-full text-white inline-block" style={{ backgroundColor: scoreColor(roastData.score) }}>
+                  {scoreLabel(roastData.score)}
+                </span>
+                <div className="flex gap-0.5 mt-3 w-32">
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <motion.div key={i} className="h-1.5 flex-1 rounded-full"
+                      initial={{ backgroundColor: "#E5E5E5" }}
+                      animate={{ backgroundColor: i < roastData.score ? scoreColor(roastData.score) : "#E5E5E5" }}
+                      transition={{ delay: 0.2 + i * 0.05, duration: 0.3 }}
+                    />
+                  ))}
+                </div>
+                <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.18em] text-[#BBBBBB] mt-1.5">
+                  Brand Brutality Score™
+                </p>
+              </div>
 
-            {/* Score bar */}
-            <div className="flex gap-1 mb-5 max-w-xs">
-              {Array.from({ length: 10 }, (_, i) => (
-                <motion.div
-                  key={i}
-                  className="h-1.5 flex-1 rounded-full"
-                  initial={{ backgroundColor: "#E5E5E5" }}
-                  animate={{ backgroundColor: i < roastData.score ? scoreColor(roastData.score) : "#E5E5E5" }}
-                  transition={{ delay: 0.2 + i * 0.06, duration: 0.3 }}
-                />
-              ))}
+              {/* Category scores */}
+              {roastData.categoryScores && (
+                <div className="flex-1 rounded-xl p-4" style={{ background: "rgba(0,0,0,0.025)", border: "1px solid rgba(0,0,0,0.05)" }}>
+                  <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.18em] text-[#BBBBBB] mb-3">Category Breakdown</p>
+                  <div className="space-y-2.5">
+                    {(["logo", "typography", "color", "voice", "consistency"] as const).map((key) => {
+                      const val = roastData.categoryScores[key];
+                      const labels: Record<string, string> = { logo: "Logo", typography: "Type", color: "Color", voice: "Voice", consistency: "Consistency" };
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="font-sans text-[10px] text-[#9B9B9B] w-20 shrink-0">{labels[key]}</span>
+                          <div className="flex gap-0.5 flex-1">
+                            {Array.from({ length: 10 }, (_, i) => (
+                              <motion.div key={i} className="h-1.5 flex-1 rounded-full"
+                                initial={{ backgroundColor: "#E5E5E5" }}
+                                animate={{ backgroundColor: i < val ? scoreColor(val) : "#E5E5E5" }}
+                                transition={{ delay: 0.3 + i * 0.04, duration: 0.25 }}
+                              />
+                            ))}
+                          </div>
+                          <span className="font-sans text-[10px] font-bold w-7 text-right shrink-0" style={{ color: scoreColor(val) }}>{val}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
-
-            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B9B9B] mb-1">
-              Brand Brutality Score™
-            </p>
 
             {/* Headline */}
-            <blockquote className="border-l-2 border-accent pl-4 mt-5 mb-6">
-              <p className="font-display italic text-lg text-[#1A1A1A] leading-snug">
+            <div className="rounded-xl px-5 py-4 mb-6" style={{ background: "rgba(0,0,0,0.02)", borderLeft: "3px solid #1A1A1A" }}>
+              <p className="font-display italic text-[1.15rem] text-[#1A1A1A] leading-snug">
                 &ldquo;{roastData.headline}&rdquo;
               </p>
-            </blockquote>
+            </div>
 
             {/* What's broken */}
-            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B9B9B] mb-3">
+            <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-[#BBBBBB] mb-2.5">
               What&rsquo;s Actually Broken
             </p>
-            <div className="space-y-2 mb-5">
+            <div className="space-y-1.5 mb-5">
               {roastData.whatsBroken.map((item, i) => (
-                <div key={i} className="flex items-start gap-2.5 bg-[#FF3B30]/[0.05] border border-[#FF3B30]/10 rounded-lg px-3 py-2.5">
-                  <X size={13} className="text-[#FF3B30] shrink-0 mt-[2px]" />
+                <div key={i} className="flex items-start gap-2.5 rounded-lg px-3 py-2.5" style={{ borderLeft: "2px solid #FF3B30", background: "rgba(255,59,48,0.04)" }}>
+                  <span className="font-mono text-[10px] font-bold text-[#FF3B30] shrink-0 mt-[1px]">{String(i + 1).padStart(2, "0")}</span>
                   <span className="font-mono text-xs text-[#2A2A2A] leading-relaxed">{item}</span>
                 </div>
               ))}
             </div>
 
             {/* Redemption */}
-            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B9B9B] mb-3">
-              The One Thing That Might Save You
+            <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-[#BBBBBB] mb-2.5">
+              One Thing That Might Save You
             </p>
-            <div className="flex items-start gap-2.5 bg-[#34C759]/[0.08] border border-[#34C759]/20 rounded-lg px-3 py-2.5 mb-5">
-              <CheckCircle2 size={14} className="text-[#34C759] shrink-0 mt-[1px]" />
+            <div className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 mb-5" style={{ borderLeft: "2px solid #34C759", background: "rgba(52,199,89,0.05)" }}>
+              <CheckCircle2 size={13} className="text-[#34C759] shrink-0 mt-[1px]" />
               <span className="font-mono text-xs text-[#1A1A1A] leading-relaxed">{roastData.whatsRedeemable}</span>
             </div>
 
             {/* Verdict */}
-            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9B9B9B] mb-2">
-              Verdict
-            </p>
-            <p className="font-sans text-sm text-[#1A1A1A] leading-relaxed mb-6">{roastData.verdict}</p>
+            <p className="font-sans text-[9px] font-semibold uppercase tracking-[0.2em] text-[#BBBBBB] mb-2">Verdict</p>
+            <p className="font-sans text-sm text-[#3A3A3A] leading-relaxed mb-6 italic">{roastData.verdict}</p>
 
             {/* Thermal Receipt Card */}
             <div className="border-t border-black/[0.06] pt-5 mb-6">

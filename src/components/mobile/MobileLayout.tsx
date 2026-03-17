@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, AlertCircle, Printer, Flame } from "lucide-react";
+import { X, AlertCircle, Printer, Flame, Share2, CheckCircle2 } from "lucide-react";
 import ReceiptCard from "@/components/windows/ReceiptCard";
 import { WALLPAPERS, DEFAULT_WALLPAPER_ID } from "@/lib/wallpapers";
 import type { RoastData } from "@/lib/types";
@@ -662,6 +662,8 @@ export default function MobileLayout() {
   const [fileError, setFileError] = useState<string | null>(null);
   const [error, setError]         = useState<string | null>(null);
   const [roastData, setRoastData] = useState<RoastData | null>(null);
+  const [roastId, setRoastId]     = useState<string | null>(null);
+  const [copied, setCopied]       = useState(false);
   const [receiptMeta, setReceiptMeta] = useState<{ id: string; date: string; time: string }>({ id: "", date: "", time: "" });
   const [downloading, setDownloading] = useState(false);
 
@@ -726,6 +728,7 @@ export default function MobileLayout() {
       const roastResult = { ...data, brandName: brandName.trim() };
       const now = new Date();
       setRoastData(roastResult);
+      if (data.roastId) setRoastId(data.roastId);
       setReceiptMeta({
         id:   String(Date.now()).slice(-8).replace(/(.{4})/, "$1-"),
         date: now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
@@ -765,7 +768,7 @@ export default function MobileLayout() {
   };
 
   const resetToForm = useCallback(() => {
-    setMode("idle"); setRoastData(null); setBrandName(""); setUrl("");
+    setMode("idle"); setRoastData(null); setRoastId(null); setCopied(false); setBrandName(""); setUrl("");
     setUploadedFile(null); setFileError(null); setError(null);
     setReceiptMeta({ id: "", date: "", time: "" });
   }, []);
@@ -975,6 +978,20 @@ export default function MobileLayout() {
                       <Printer size={15} />
                       {downloading ? "Generating…" : "Download Receipt"}
                     </motion.button>
+                    {roastId && (
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={async () => {
+                          await navigator.clipboard.writeText(`https://roastmybrand.wtf/roast/${roastId}`);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2500);
+                        }}
+                        className="w-full h-[50px] font-sans font-semibold rounded-[12px] flex items-center justify-center gap-2 transition-colors"
+                        style={{ fontSize: "15px", background: copied ? "#34C759" : "rgba(0,113,227,0.09)", color: copied ? "white" : "#0071E3" }}>
+                        {copied ? <CheckCircle2 size={15} /> : <Share2 size={15} />}
+                        {copied ? "Link Copied!" : "Share Roast"}
+                      </motion.button>
+                    )}
                     <p className="font-sans text-[11px] text-[#AAAAAA] text-center">Perfect for Instagram · 1080×1350px</p>
                     <button onClick={resetToForm}
                       className="w-full h-[50px] font-sans font-semibold text-[#1A1A1A] rounded-[12px]"
