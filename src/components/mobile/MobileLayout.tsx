@@ -732,7 +732,7 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
           <button
             key={app.id}
             onClick={() => handlePress(app.id)}
-            className="flex flex-col items-center gap-1"
+            className="flex items-center justify-center"
             style={{
               transform: pressed === app.id ? "scale(1.15)" : "scale(1)",
               transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
@@ -747,9 +747,6 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
               className="select-none"
               style={{ width: 48, height: 48, objectFit: "contain" }}
             />
-            <span className="font-sans text-[9px] text-[#1A1A1A] font-medium" style={{ letterSpacing: "0.02em" }}>
-              {app.name}
-            </span>
           </button>
         ))}
       </div>
