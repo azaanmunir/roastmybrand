@@ -22,7 +22,7 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
 }) => {
   return (
     <div
-      className="relative flex font-semibold overflow-hidden text-black cursor-pointer transition-all duration-700 rounded-3xl"
+      className="relative flex font-semibold text-black cursor-pointer transition-all duration-700 rounded-3xl"
       style={{
         boxShadow: '0 6px 6px rgba(0,0,0,0.2), 0 0 20px rgba(0,0,0,0.1)',
         transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 2.2)',
@@ -61,7 +61,7 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
           >
             {/* Tooltip */}
             <div
-              className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none select-none opacity-0 group-hover/icon:opacity-100 transition-opacity duration-150 whitespace-nowrap"
+              className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 pointer-events-none select-none opacity-0 group-hover/icon:opacity-100 transition-opacity duration-150 whitespace-nowrap"
               style={{
                 background: 'rgba(24,24,24,0.85)',
                 backdropFilter: 'blur(10px)',
