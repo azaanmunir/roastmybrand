@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Clock, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { Clock, ChevronRight, Trash2 } from "lucide-react";
 import Window from "./Window";
 
-interface HistoryEntry {
+export interface HistoryEntry {
   id: number;
   brandName: string;
   score: number;
@@ -13,6 +12,8 @@ interface HistoryEntry {
   whatsBroken: string[];
   whatsRedeemable: string;
   verdict: string;
+  categoryScores?: { logo: number; typography: number; color: number; voice: number; consistency: number };
+  roastId?: string;
   date: string;
 }
 
@@ -40,13 +41,13 @@ interface Props {
   initialX: number;
   initialY: number;
   onOpenRoast: () => void;
+  onSelectEntry: (entry: HistoryEntry) => void;
 }
 
 export default function HistoryWindow({
-  zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY, onOpenRoast,
+  zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY, onOpenRoast, onSelectEntry,
 }: Props) {
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
-  const [expanded, setExpanded] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -58,10 +59,7 @@ export default function HistoryWindow({
   const clearHistory = () => {
     localStorage.removeItem("roastHistory");
     setEntries([]);
-    setExpanded(null);
   };
-
-  const toggle = (id: number) => setExpanded((prev) => (prev === id ? null : id));
 
   return (
     <Window
@@ -120,79 +118,35 @@ export default function HistoryWindow({
                 </button>
               </div>
             ) : (
-              <AnimatePresence initial={false}>
-                {entries.map((entry) => (
-                  <motion.div key={entry.id} layout transition={{ duration: 0.2 }}>
-                    {/* Row */}
-                    <div
-                      className="flex items-center gap-3 px-4 py-2.5 border-b border-black/[0.05] cursor-pointer hover:bg-black/[0.02] transition-colors"
-                      onClick={() => toggle(entry.id)}
-                    >
-                      {/* Chevron */}
-                      <span className="shrink-0 text-[#C0C0C0]">
-                        {expanded === entry.id
-                          ? <ChevronDown size={12} />
-                          : <ChevronRight size={12} />}
-                      </span>
+              <>{entries.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex items-center gap-3 px-4 py-2.5 border-b border-black/[0.05] cursor-pointer hover:bg-black/[0.02] active:bg-black/[0.04] transition-colors group"
+                  onClick={() => onSelectEntry(entry)}
+                >
+                  {/* Score badge */}
+                  <div
+                    className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                    style={{ background: scoreBg(entry.score), border: `1.5px solid ${scoreColor(entry.score)}30` }}
+                  >
+                    <span className="font-display font-bold leading-none" style={{ fontSize: "0.9rem", color: scoreColor(entry.score) }}>
+                      {entry.score}
+                    </span>
+                  </div>
 
-                      {/* Score badge */}
-                      <div
-                        className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
-                        style={{ background: scoreBg(entry.score), border: `1.5px solid ${scoreColor(entry.score)}30` }}
-                      >
-                        <span className="font-display font-bold leading-none" style={{ fontSize: "0.9rem", color: scoreColor(entry.score) }}>
-                          {entry.score}
-                        </span>
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-sans text-[12.5px] font-semibold text-[#1A1A1A] truncate">{entry.brandName}</span>
-                          <span className="font-sans text-[10px] text-[#C0C0C0] shrink-0">{relativeTime(entry.date)}</span>
-                        </div>
-                        <p className="font-sans text-[11px] text-[#9B9B9B] truncate mt-0.5">{entry.headline}</p>
-                      </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-sans text-[12.5px] font-semibold text-[#1A1A1A] truncate">{entry.brandName}</span>
+                      <span className="font-sans text-[10px] text-[#C0C0C0] shrink-0">{relativeTime(entry.date)}</span>
                     </div>
+                    <p className="font-sans text-[11px] text-[#9B9B9B] truncate mt-0.5">{entry.headline}</p>
+                  </div>
 
-                    {/* Expanded detail */}
-                    <AnimatePresence>
-                      {expanded === entry.id && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-4 py-3 space-y-3 border-b border-black/[0.05]" style={{ background: "rgba(0,0,0,0.015)" }}>
-                            <div>
-                              <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9B9B9B] mb-1.5">What&apos;s Broken</p>
-                              <ul className="space-y-1">
-                                {entry.whatsBroken.map((item, i) => (
-                                  <li key={i} className="flex items-start gap-2 font-sans text-[12px] text-[#3A3A3A]">
-                                    <span className="text-[#FF3B30] shrink-0 mt-0.5">✗</span> {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            <div>
-                              <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9B9B9B] mb-1">What Works</p>
-                              <p className="font-sans text-[12px] text-[#3A3A3A]">
-                                <span className="text-[#34C759] mr-1">✓</span>{entry.whatsRedeemable}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9B9B9B] mb-1">Verdict</p>
-                              <p className="font-sans text-[12px] text-[#3A3A3A] leading-relaxed">{entry.verdict}</p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                  {/* Arrow indicator */}
+                  <ChevronRight size={12} className="shrink-0 text-[#C0C0C0] group-hover:text-[#9B9B9B] transition-colors" />
+                </div>
+              ))}</>
             )}
           </div>
         </div>

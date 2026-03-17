@@ -48,9 +48,10 @@ interface Props {
   initialX: number;
   initialY: number;
   resetKey?: number;
+  preloadedRoast?: RoastData | null;
 }
 
-export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY, resetKey }: Props) {
+export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMinimize, initialX, initialY, resetKey, preloadedRoast }: Props) {
   const [mode, setMode]         = useState<Mode>("idle");
   const [rateLimited, setRateLimited] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
@@ -90,6 +91,20 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
     setUploadedFile(null);
     setFileError(null);
   }, [resetKey]);
+
+  useEffect(() => {
+    if (!preloadedRoast) return;
+    setRoastData(preloadedRoast);
+    setRoastId(preloadedRoast.roastId ?? null);
+    setCopied(false);
+    const now = new Date();
+    setReceiptMeta({
+      id: String(Date.now()).slice(-8).replace(/(.{4})/, "$1-"),
+      date: now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
+      time: now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
+    });
+    setMode("result");
+  }, [preloadedRoast]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,6 +148,8 @@ export default function RoastWindow({ zIndex, isActive, onFocus, onClose, onMini
         whatsBroken: data.whatsBroken,
         whatsRedeemable: data.whatsRedeemable,
         verdict: data.verdict,
+        categoryScores: data.categoryScores,
+        roastId: data.roastId,
         date: new Date().toISOString(),
       };
       const updated = [entry, ...existing].slice(0, 10);

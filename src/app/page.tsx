@@ -9,7 +9,8 @@ import RoastWindow from "@/components/windows/RoastWindow";
 import LiveRoastsWindow from "@/components/windows/LiveRoastsWindow";
 import TerminalWindow from "@/components/windows/TerminalWindow";
 import WallpapersWindow from "@/components/windows/WallpapersWindow";
-import HistoryWindow from "@/components/windows/HistoryWindow";
+import HistoryWindow, { type HistoryEntry } from "@/components/windows/HistoryWindow";
+import type { RoastData } from "@/lib/types";
 import ContactWindow from "@/components/windows/ContactWindow";
 import PortfolioWindow from "@/components/windows/PortfolioWindow";
 import HallOfShameWindow from "@/components/windows/HallOfShameWindow";
@@ -51,6 +52,7 @@ export default function Page() {
   const [showPortfolio, setShowPortfolio]     = useState(false);
   const [showHallOfShame, setShowHallOfShame] = useState(false);
   const [showChecklist, setShowChecklist]     = useState(false);
+  const [preloadedRoast, setPreloadedRoast]   = useState<RoastData | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -101,7 +103,7 @@ export default function Page() {
       const s = windows.liveroasts;
       s.isOpen && !s.isMinimized ? minimizeWindow("liveroasts") : openWindow("liveroasts");
     }
-    if (action === "new-roast") openWindow("roast");
+    if (action === "new-roast") { setPreloadedRoast(null); setResetKey((k) => k + 1); openWindow("roast"); }
     if (action === "restart") { window.location.reload(); }
     if (action === "shutdown") {
       setShutDown(true);
@@ -189,6 +191,7 @@ export default function Page() {
               initialX={positions.roast.x}
               initialY={positions.roast.y}
               resetKey={resetKey}
+              preloadedRoast={preloadedRoast}
             />
           )}
 
@@ -240,6 +243,21 @@ export default function Page() {
               initialX={positions.history.x}
               initialY={positions.history.y}
               onOpenRoast={() => { openWindow("roast"); closeWindow("history"); }}
+              onSelectEntry={(entry: HistoryEntry) => {
+                const roastData: RoastData = {
+                  brandName: entry.brandName,
+                  score: entry.score,
+                  headline: entry.headline,
+                  whatsBroken: entry.whatsBroken,
+                  whatsRedeemable: entry.whatsRedeemable,
+                  verdict: entry.verdict,
+                  categoryScores: entry.categoryScores ?? { logo: 0, typography: 0, color: 0, voice: 0, consistency: 0 },
+                  roastId: entry.roastId,
+                };
+                setPreloadedRoast(roastData);
+                openWindow("roast");
+                bringToFront("roast");
+              }}
             />
           )}
 
