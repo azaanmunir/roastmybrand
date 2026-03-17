@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
-import { getStore } from "@netlify/blobs";
+import { kv } from "@vercel/kv";
 import { nanoid } from "nanoid";
 import type { RoastOutput } from "@/lib/types";
 
@@ -167,22 +167,21 @@ Be specific to this brand. No generic filler. Make it sting.`;
       headline: roast.headline,
     }));
 
-    // ── Save to Netlify Blobs for shareable URL ────────────────
+    // ── Save to Vercel KV for shareable URL ───────────────────
     let roastId: string | undefined;
     try {
       roastId = nanoid(10);
-      const store = getStore("roasts");
-      const now = new Date();
-      await store.setJSON(roastId, {
+      const nowDate = new Date();
+      await kv.set(`roast:${roastId}`, {
         ...roast,
         brandName,
-        createdAt: now.toISOString(),
+        createdAt: nowDate.toISOString(),
         receiptId: String(Date.now()).slice(-8).replace(/(.{4})/, "$1-"),
-        date: now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
-        time: now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
-      });
+        date: nowDate.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
+        time: nowDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
+      }, { ex: 60 * 60 * 24 * 90 }); // 90-day expiry
     } catch (e) {
-      console.warn("[/api/roast] Blob save failed (non-fatal):", e);
+      console.warn("[/api/roast] KV save failed (non-fatal):", e);
     }
 
     return NextResponse.json({ ...roast, roastId });

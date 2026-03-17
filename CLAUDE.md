@@ -16,7 +16,8 @@ RoastMyBrand.wtf — A viral AI-powered brand roasting tool. Users submit a bran
 - **Framer Motion** (all animations and window dragging)
 - **Claude API** — `claude-sonnet-4-6` for roast generation and terminal chat
 - **next/font** (Instrument Serif, Inter, JetBrains Mono — never raw `@import`)
-- **Netlify** (deployment target — live at www.roastmybrand.wtf)
+- **Vercel** (deployment target — live at www.roastmybrand.wtf)
+- **@vercel/kv** (Redis KV store for shareable roast URLs — 90-day expiry)
 
 ## Commands
 
@@ -32,6 +33,8 @@ npm run type-check  # tsc --noEmit
 ```
 ANTHROPIC_API_KEY        # Required — Claude API access
 NEXT_PUBLIC_SITE_URL     # Public URL for og/share links
+KV_REST_API_URL          # Auto-injected by Vercel KV
+KV_REST_API_TOKEN        # Auto-injected by Vercel KV
 ```
 
 ## Architecture
