@@ -399,30 +399,109 @@ function ContactSheetContent() {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    PORTFOLIO SHEET
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const KOFEE_IMAGES = Array.from({ length: 22 }, (_, i) => `/portfolio/Kofee/Kofee-${String(i + 1).padStart(2, "0")}.jpg`);
+
+const PORTFOLIO_PROJECTS = [
+  { title: "Kofee", category: "Branding", thumbnail: KOFEE_IMAGES[0], images: KOFEE_IMAGES },
+  { title: "Solea Tanning UAE",   category: "Packaging",    thumbnail: null, images: [], gradient: "linear-gradient(135deg, #f7971e 0%, #ffd200 100%)" },
+  { title: "TAKMEEL Real Estate", category: "Branding",     thumbnail: null, images: [], gradient: "linear-gradient(135deg, #1c1c1c 0%, #2d6a4f 100%)" },
+  { title: "Vinteeze Etsy Store", category: "Social Media", thumbnail: null, images: [], gradient: "linear-gradient(135deg, #833ab4 0%, #fcb045 100%)" },
+];
+
 function PortfolioSheetContent() {
-  const PROJECTS = [
-    { title: "Diyar Furniture Brand", category: "Branding",     gradient: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%)" },
-    { title: "Solea Tanning UAE",     category: "Packaging",    gradient: "linear-gradient(135deg, #f7971e 0%, #ffd200 100%)" },
-    { title: "TAKMEEL Real Estate",   category: "Branding",     gradient: "linear-gradient(135deg, #1c1c1c 0%, #2d6a4f 100%)" },
-    { title: "Vinteeze Etsy Store",   category: "Social Media", gradient: "linear-gradient(135deg, #833ab4 0%, #fcb045 100%)" },
-  ];
+  const [gallery, setGallery] = useState<{ images: string[]; index: number; title: string } | null>(null);
+
+  if (gallery) {
+    return (
+      <div className="flex flex-col h-full" style={{ background: "#000", minHeight: "calc(85vh - 88px)" }}>
+        {/* Gallery header */}
+        <div className="flex items-center justify-between px-4 py-3 shrink-0">
+          <span className="font-sans text-[14px] font-semibold text-white">{gallery.title}</span>
+          <div className="flex items-center gap-3">
+            <span className="font-sans text-[12px] text-white/50">{gallery.index + 1} / {gallery.images.length}</span>
+            <button onClick={() => setGallery(null)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+              <X size={14} className="text-white" />
+            </button>
+          </div>
+        </div>
+
+        {/* Main image */}
+        <div className="relative flex-1 mx-4 rounded-xl overflow-hidden" style={{ minHeight: 280 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={gallery.images[gallery.index]}
+            alt={`${gallery.title} ${gallery.index + 1}`}
+            className="w-full h-full object-contain"
+          />
+          {/* Prev / Next tap zones */}
+          <button
+            className="absolute left-0 top-0 bottom-0 w-1/3"
+            onClick={() => setGallery((g) => g ? { ...g, index: (g.index - 1 + g.images.length) % g.images.length } : g)}
+          />
+          <button
+            className="absolute right-0 top-0 bottom-0 w-1/3"
+            onClick={() => setGallery((g) => g ? { ...g, index: (g.index + 1) % g.images.length } : g)}
+          />
+          {/* Arrow hints */}
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center pointer-events-none">
+            <span className="text-white text-[12px]">‹</span>
+          </div>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center pointer-events-none">
+            <span className="text-white text-[12px]">›</span>
+          </div>
+        </div>
+
+        {/* Thumbnail strip */}
+        <div className="flex gap-2 px-4 py-3 overflow-x-auto shrink-0">
+          {gallery.images.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => setGallery((g) => g ? { ...g, index: i } : g)}
+              className={`shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                i === gallery.index ? "border-white" : "border-transparent opacity-40"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-5 py-4">
       <h3 className="font-display text-[1.3rem] italic text-[#1A1A1A] leading-tight mb-5">
         10+ Years. 1,300+ Clients.<br />Zero Generic Brands.
       </h3>
       <div className="grid grid-cols-2 gap-3 mb-5">
-        {PROJECTS.map((p) => (
-          <div key={p.title} className="rounded-xl overflow-hidden border border-black/[0.07]">
-            <div className="w-full h-24" style={{ background: p.gradient }} />
+        {PORTFOLIO_PROJECTS.map((p) => (
+          <div
+            key={p.title}
+            className={`rounded-xl overflow-hidden border border-black/[0.07] ${p.images.length > 0 ? "cursor-pointer active:scale-95 transition-transform" : ""}`}
+            style={{ background: "#FAFAFA" }}
+            onClick={() => p.images.length > 0 && setGallery({ images: p.images, index: 0, title: p.title })}
+          >
+            <div className="w-full h-24 relative overflow-hidden">
+              {p.thumbnail ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.thumbnail} alt={p.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full" style={{ background: (p as { gradient?: string }).gradient }} />
+              )}
+            </div>
             <div className="p-3">
               <p className="font-sans text-[12px] font-semibold text-[#1A1A1A] leading-tight mb-1">{p.title}</p>
-              <span className="font-sans text-[10px] text-[#0071E3] font-semibold">{p.category}</span>
+              <div className="flex items-center justify-between">
+                <span className="font-sans text-[10px] text-[#0071E3] font-semibold">{p.category}</span>
+                {p.images.length > 0 && <span className="font-sans text-[10px] text-[#AAAAAA]">{p.images.length} slides</span>}
+              </div>
             </div>
           </div>
         ))}
       </div>
-      <a href="https://behance.net" target="_blank" rel="noopener noreferrer"
+      <a href="https://behance.net/azaanali" target="_blank" rel="noopener noreferrer"
         className="flex items-center justify-center w-full py-3 bg-[#0071E3] text-white font-sans text-[14px] font-semibold rounded-xl">
         See Full Portfolio on Behance →
       </a>
