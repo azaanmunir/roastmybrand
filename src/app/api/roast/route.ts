@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
 import { nanoid } from "nanoid";
 import type { RoastOutput } from "@/lib/types";
 
@@ -172,7 +173,7 @@ Be specific to this brand. No generic filler. Make it sting.`;
     try {
       roastId = nanoid(10);
       const nowDate = new Date();
-      await kv.set(`roast:${roastId}`, {
+      await redis.set(`roast:${roastId}`, {
         ...roast,
         brandName,
         createdAt: nowDate.toISOString(),
