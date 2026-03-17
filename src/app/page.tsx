@@ -147,8 +147,8 @@ export default function Page() {
       <div
         className="fixed inset-0 overflow-hidden"
         style={
-          wallpaper.image
-            ? { backgroundImage: `url(${wallpaper.image})`, backgroundSize: "cover", backgroundPosition: "center", transition: "background 0.7s ease" }
+          wallpaper.webImage
+            ? { backgroundImage: `url(${wallpaper.webImage})`, backgroundSize: "cover", backgroundPosition: "center", transition: "background 0.7s ease" }
             : { background: wallpaper.gradient, transition: "background 0.7s ease" }
         }
       >

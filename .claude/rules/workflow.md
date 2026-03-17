@@ -12,7 +12,7 @@ description: Build workflow and process rules
 7. Build share functionality
 8. Add Stripe paywall for PDF
 9. Screenshot loop until 95%+ quality
-10. Deploy to Vercel
+10. Deploy to Netlify (git push → auto-deploys to www.roastmybrand.wtf)
 
 ## Screenshot Loop Rule
 After every major section: screenshot → compare → list gaps → fix → repeat.

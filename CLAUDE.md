@@ -16,7 +16,7 @@ RoastMyBrand.wtf — A viral AI-powered brand roasting tool. Users submit a bran
 - **Framer Motion** (all animations and window dragging)
 - **Claude API** — `claude-sonnet-4-6` for roast generation and terminal chat
 - **next/font** (Instrument Serif, Inter, JetBrains Mono — never raw `@import`)
-- **Vercel** (deployment target)
+- **Netlify** (deployment target — live at www.roastmybrand.wtf)
 
 ## Commands
 

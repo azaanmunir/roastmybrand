@@ -79,10 +79,10 @@ yourself based on current best practices.
 
 Once the build looks solid locally, paste this:
 ```
-The site looks good locally. Now deploy it to Vercel.
+The site looks good locally. Now deploy it to Netlify.
 
 1. Initialize a Git repo if not already done
-2. Create a Vercel project called roastmybrand
+2. Create a Netlify project called roastmybrand (live at www.roastmybrand.wtf)
 3. Set up environment variables: ANTHROPIC_API_KEY, NEXT_PUBLIC_SITE_URL
 4. Add Stripe or LemonSqueezy for the $7 paid report — wire the 
    /api/checkout route

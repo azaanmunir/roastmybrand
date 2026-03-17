@@ -12,7 +12,7 @@ Output is a shareable card. Paid tier unlocks full PDF report.
 - Claude API (roast generation)
 - Stripe or LemonSqueezy (payments)
 - html2canvas (card screenshot export)
-- Vercel (deploy)
+- Netlify (deploy — live at www.roastmybrand.wtf)
 
 ## Brand Personality
 Brutal. Funny. Smart. Think Gordon Ramsay meets brand consultant.

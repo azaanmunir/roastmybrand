@@ -320,7 +320,7 @@ function WallpapersSheetContent({
             key={w.id}
             onClick={() => onSelect(w.id)}
             className="relative rounded-xl overflow-hidden h-28 flex items-end p-2.5"
-            style={w.image ? { backgroundImage: `url(${w.image})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: w.gradient }}
+            style={w.mobileImage ? { backgroundImage: `url(${w.mobileImage})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: w.gradient }}
           >
             {activeId === w.id && (
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,113,227,0.25)" }}>
@@ -649,8 +649,8 @@ export default function MobileLayout() {
   /* ── Wallpaper ── */
   const [wallpaperId, setWallpaperId] = useState(DEFAULT_WALLPAPER_ID);
   const wallpaper = WALLPAPERS.find((w) => w.id === wallpaperId) ?? WALLPAPERS[0];
-  const bgStyle: React.CSSProperties = wallpaper.image
-    ? { backgroundImage: `url(${wallpaper.image})`, backgroundSize: "cover", backgroundPosition: "center" }
+  const bgStyle: React.CSSProperties = wallpaper.mobileImage
+    ? { backgroundImage: `url(${wallpaper.mobileImage})`, backgroundSize: "cover", backgroundPosition: "center" }
     : { background: wallpaper.gradient };
 
   /* ── Roast form ── */

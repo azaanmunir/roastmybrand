@@ -2,7 +2,8 @@ export interface Wallpaper {
   id: string;
   label: string;
   gradient: string;
-  image?: string;
+  webImage?: string;
+  mobileImage?: string;
 }
 
 export const WALLPAPERS: Wallpaper[] = [
@@ -10,25 +11,29 @@ export const WALLPAPERS: Wallpaper[] = [
     id: "duck",
     label: "Duck",
     gradient: "",
-    image: "/wallpapers/duck.jpg",
+    webImage: "/wallpapers/web/duck.jpg",
+    mobileImage: "/wallpapers/mobile/duck mobile.jpg",
   },
   {
     id: "starfield",
     label: "Starfield",
     gradient: "",
-    image: "/wallpapers/Starfield I Mac.heic",
+    webImage: "/wallpapers/web/Starfield I Mac.jpg",
+    mobileImage: "/wallpapers/mobile/Starfield I iPhone.jpg",
   },
   {
     id: "tulip",
     label: "Tulip",
     gradient: "",
-    image: "/wallpapers/Tulip Mac.png",
+    webImage: "/wallpapers/web/Tulip Mac.jpg",
+    mobileImage: "/wallpapers/mobile/Tulip iPhone.jpg",
   },
   {
     id: "waterway",
     label: "Waterway",
     gradient: "",
-    image: "/wallpapers/Waterway 1 Mac.heic",
+    webImage: "/wallpapers/web/Waterway 1 Mac.jpg",
+    mobileImage: "/wallpapers/mobile/Waterway1 iPhone.jpg",
   },
 ];
 
