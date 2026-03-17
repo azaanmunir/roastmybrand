@@ -724,19 +724,22 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
       />
 
       {/* Icons */}
-      <div className="relative z-30 flex items-end gap-1 px-3 py-2">
+      <div className="relative z-30 flex items-end gap-3 px-5 py-2">
         {DOCK_APPS.map((app) => (
           <button
             key={app.id}
             onClick={() => handlePress(app.id)}
-            className="flex flex-col items-center gap-1 px-2"
+            className="flex flex-col items-center gap-1"
             style={{
               transform: pressed === app.id ? "scale(1.15)" : "scale(1)",
               transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={app.icon} alt={app.name} className="w-12 h-12 select-none" style={{ objectFit: "contain" }} />
+            {/* Fixed-size container ensures all icons render at identical dimensions */}
+            <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center select-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={app.icon} alt={app.name} className="w-full h-full" style={{ objectFit: "cover" }} />
+            </div>
             <span className="font-sans text-[9px] text-[#1A1A1A] font-medium" style={{ letterSpacing: "0.02em" }}>
               {app.name}
             </span>
