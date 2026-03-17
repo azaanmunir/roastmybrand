@@ -40,7 +40,7 @@ export default function WallpapersWindow({
           style={{
             height: "160px",
             flexShrink: 0,
-            backgroundImage: active.webImage ? `url(${active.webImage})` : active.gradient,
+            backgroundImage: active.webImage ? `url("${active.webImage}")` : active.gradient,
             backgroundSize: "cover",
             backgroundPosition: "center",
             borderBottom: "1px solid rgba(0,0,0,0.08)",
@@ -74,7 +74,7 @@ export default function WallpapersWindow({
                     className="w-full rounded-lg relative overflow-hidden transition-transform duration-150 group-hover:scale-[1.04]"
                     style={{
                       height: "60px",
-                      backgroundImage: wp.webImage ? `url(${wp.webImage})` : wp.gradient,
+                      backgroundImage: wp.webImage ? `url("${wp.webImage}")` : wp.gradient,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       border: isSelected ? "2px solid #007AFF" : "2px solid rgba(0,0,0,0.1)",

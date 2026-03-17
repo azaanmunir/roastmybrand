@@ -148,7 +148,7 @@ export default function Page() {
         className="fixed inset-0 overflow-hidden"
         style={
           wallpaper.webImage
-            ? { backgroundImage: `url(${wallpaper.webImage})`, backgroundSize: "cover", backgroundPosition: "center", transition: "background 0.7s ease" }
+            ? { backgroundImage: `url("${wallpaper.webImage}")`, backgroundSize: "cover", backgroundPosition: "center", transition: "background 0.7s ease" }
             : { background: wallpaper.gradient, transition: "background 0.7s ease" }
         }
       >
