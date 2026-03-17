@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 
 const FOLDER_NORMAL = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 564.77 442.19" width="64" height="64">
@@ -23,6 +23,8 @@ interface Props {
 }
 
 export default function DesktopFolder({ label, onClick, position }: Props) {
+  const x = useMotionValue(position.x);
+  const y = useMotionValue(position.y);
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState(false);
   const lastClick = useRef(0);
@@ -45,11 +47,10 @@ export default function DesktopFolder({ label, onClick, position }: Props) {
       drag
       dragMomentum={false}
       dragElastic={0}
-      initial={{ x: position.x, y: position.y }}
+      style={{ position: "absolute", left: 0, top: 0, x, y, width: 80, userSelect: "none", zIndex: selected ? 50 : 10, cursor: "grab" }}
+      whileDrag={{ cursor: "grabbing", zIndex: 100 }}
       onDragStart={() => { dragMoved.current = true; setSelected(false); }}
       onDragEnd={() => { setTimeout(() => { dragMoved.current = false; }, 50); }}
-      style={{ position: "absolute", left: 0, top: 0, width: 80, cursor: "grab", userSelect: "none", zIndex: selected ? 50 : 10 }}
-      whileDrag={{ cursor: "grabbing", zIndex: 100 }}
       onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
