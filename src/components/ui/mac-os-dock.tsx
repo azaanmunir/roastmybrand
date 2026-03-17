@@ -148,16 +148,50 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
   return (
     <div
       ref={dockRef}
-      className={`glass-dock ${className}`}
+      className={`relative overflow-hidden ${className}`}
       style={{
         width: `${contentWidth + padding * 2}px`,
         borderRadius: '24px',
         padding: `${padding}px`,
+        boxShadow: '0 6px 24px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.25)',
+        transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 2.2)',
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="relative" style={{ height: `${baseIconSize}px`, width: '100%' }}>
+      {/* Liquid glass layer 1 — distortion + blur */}
+      <div
+        className="absolute inset-0"
+        style={{
+          borderRadius: '24px',
+          backdropFilter: 'blur(3px)',
+          filter: 'url(#glass-distortion)',
+          isolation: 'isolate',
+          overflow: 'hidden',
+          zIndex: 0,
+        }}
+      />
+      {/* Liquid glass layer 2 — white tint */}
+      <div
+        className="absolute inset-0"
+        style={{
+          borderRadius: '24px',
+          background: 'rgba(255,255,255,0.22)',
+          zIndex: 1,
+        }}
+      />
+      {/* Liquid glass layer 3 — inner highlight edges */}
+      <div
+        className="absolute inset-0"
+        style={{
+          borderRadius: '24px',
+          boxShadow: 'inset 2px 2px 1px rgba(255,255,255,0.55), inset -1px -1px 1px rgba(255,255,255,0.45)',
+          overflow: 'hidden',
+          zIndex: 2,
+        }}
+      />
+      {/* Icons */}
+      <div className="relative" style={{ height: `${baseIconSize}px`, width: '100%', zIndex: 3 }}>
         {apps.map((app, index) => {
           const scale = currentScales[index] ?? 1;
           const position = currentPositions[index] ?? 0;
