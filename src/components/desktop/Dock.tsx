@@ -17,8 +17,8 @@ const DOCK_APPS = [
   { id: "pricing",    name: "Pricing",         icon: "https://cdn.jim-nielsen.com/macos/1024/notes-2021-05-25.png?rf=1024" },
   { id: "contact",    name: "Contact",         icon: "https://cdn.jim-nielsen.com/macos/1024/mail-2021-05-25.png?rf=1024" },
   { id: "divider-social", name: "", icon: "", divider: true },
-  { id: "instagram",  name: "Instagram",       icon: "/icons/instagram.png", href: "https://instagram.com/azaanali" },
-  { id: "linkedin",   name: "LinkedIn",        icon: "/icons/linkedin.png",  href: "https://linkedin.com/in/azaanali" },
+  { id: "instagram",  name: "Instagram",       icon: "/icons/instagram.png", href: "https://instagram.com/azaanali", iconPadding: 8 },
+  { id: "linkedin",   name: "LinkedIn",        icon: "/icons/linkedin.png",  href: "https://linkedin.com/in/azaanali", iconPadding: 8 },
 ];
 
 export default function Dock({ onIconClick, openWindows = [] }: DockProps) {

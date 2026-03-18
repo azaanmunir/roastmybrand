@@ -8,6 +8,7 @@ interface DockApp {
   icon: string;
   href?: string;
   divider?: boolean;
+  iconPadding?: number;
 }
 
 interface MacOSDockProps {
@@ -100,6 +101,7 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
               style={{
                 transformOrigin: 'bottom center',
                 transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 2.2)',
+                padding: app.iconPadding ?? 0,
               }}
             />
 

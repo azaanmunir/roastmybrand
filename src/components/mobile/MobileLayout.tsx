@@ -58,8 +58,8 @@ const DOCK_APPS = [
   { id: "wallpapers", name: "Wallpapers",icon: "https://cdn.jim-nielsen.com/macos/1024/photos-2021-05-28.png?rf=1024" },
   { id: "contact",    name: "Contact",   icon: "https://cdn.jim-nielsen.com/macos/1024/mail-2021-05-25.png?rf=1024" },
   { id: "divider-social", name: "", icon: "", divider: true },
-  { id: "instagram",  name: "Instagram", icon: "/icons/instagram.png", href: "https://instagram.com/azaanali" },
-  { id: "linkedin",   name: "LinkedIn",  icon: "/icons/linkedin.png",  href: "https://linkedin.com/in/azaanali" },
+  { id: "instagram",  name: "Instagram", icon: "/icons/instagram.png", href: "https://instagram.com/azaanali", iconPadding: 6 },
+  { id: "linkedin",   name: "LinkedIn",  icon: "/icons/linkedin.png",  href: "https://linkedin.com/in/azaanali", iconPadding: 6 },
 ];
 
 const FOLDER_SVG_NORMAL = (
@@ -752,7 +752,7 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
               width={48}
               height={48}
               className="select-none"
-              style={{ width: 48, height: 48, objectFit: "contain" }}
+              style={{ width: 48, height: 48, objectFit: "contain", padding: app.iconPadding ?? 0 }}
             />
           </button>
         ))}
