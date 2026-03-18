@@ -697,24 +697,25 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
     <div
       className="fixed z-[200] left-1/2 -translate-x-1/2"
       style={{
-        bottom: "calc(16px + env(safe-area-inset-bottom))",
-        borderRadius: 28,
+        bottom: "calc(20px + env(safe-area-inset-bottom))",
+        borderRadius: 36,
         boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12)",
       }}
     >
       {/* Glass layer 1 — distortion + blur */}
-      <div className="absolute inset-0 z-0 overflow-hidden" style={{ borderRadius: 28, backdropFilter: "blur(3px)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
+      <div className="absolute inset-0 z-0 overflow-hidden" style={{ borderRadius: 36, backdropFilter: "blur(20px) saturate(180%)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
       {/* Glass layer 2 — white tint */}
-      <div className="absolute inset-0 z-10" style={{ borderRadius: 28, background: "rgba(255,255,255,0.28)" }} />
+      <div className="absolute inset-0 z-10" style={{ borderRadius: 36, background: "rgba(255,255,255,0.35)" }} />
       {/* Glass layer 3 — inner highlight */}
-      <div className="absolute inset-0 z-20 overflow-hidden" style={{ borderRadius: 28, boxShadow: "inset 2px 2px 1px 0 rgba(255,255,255,0.55), inset -1px -1px 1px 1px rgba(255,255,255,0.55)" }} />
+      <div className="absolute inset-0 z-20 overflow-hidden" style={{ borderRadius: 36, boxShadow: "inset 2px 2px 1px 0 rgba(255,255,255,0.6), inset -1px -1px 1px 1px rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.7)" }} />
 
       {/* Icons */}
-      <div className="relative z-30 flex items-center gap-1 px-4 py-2.5">
+      <div className="relative z-30 flex items-end gap-3 px-5 py-3">
         {DOCK_APPS.map((app) => (
           <button
             key={app.id}
             onClick={() => handlePress(app.id)}
+            className="flex flex-col items-center gap-1"
             style={{
               transform: pressed === app.id ? "scale(0.88)" : "scale(1)",
               transition: "transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
@@ -725,8 +726,11 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
               src={app.icon}
               alt={app.name}
               className="select-none"
-              style={{ width: 52, height: 52, objectFit: "contain" }}
+              style={{ width: 62, height: 62, objectFit: "contain" }}
             />
+            <span style={{ fontSize: 10, color: "rgba(0,0,0,0.6)", fontFamily: "var(--font-sans)", letterSpacing: "-0.01em" }}>
+              {app.name}
+            </span>
           </button>
         ))}
       </div>
