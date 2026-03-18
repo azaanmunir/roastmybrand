@@ -8,7 +8,7 @@ interface DockApp {
   icon: string;
   href?: string;
   divider?: boolean;
-  iconPadding?: number;
+  iconSizePx?: number;
 }
 
 interface MacOSDockProps {
@@ -97,11 +97,12 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
               src={app.icon}
               alt={app.name}
               draggable={false}
-              className="w-16 h-16 select-none transition-all duration-700 group-hover/icon:scale-110"
+              className="select-none transition-all duration-700 group-hover/icon:scale-110"
               style={{
+                width: app.iconSizePx ?? 64,
+                height: app.iconSizePx ?? 64,
                 transformOrigin: 'bottom center',
                 transitionTimingFunction: 'cubic-bezier(0.175, 0.885, 0.32, 2.2)',
-                padding: app.iconPadding ?? 0,
               }}
             />
 
