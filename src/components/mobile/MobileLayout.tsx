@@ -52,14 +52,11 @@ const GLASS_PANEL = {
 } as React.CSSProperties;
 
 const DOCK_APPS = [
-  { id: "roast",      name: "Roast",     icon: "https://cdn.jim-nielsen.com/macos/1024/music-2021-05-25.png?rf=1024" },
-  { id: "terminal",   name: "Terminal",  icon: "https://cdn.jim-nielsen.com/macos/1024/terminal-2021-06-03.png?rf=1024" },
-  { id: "history",    name: "History",   icon: "https://cdn.jim-nielsen.com/macos/1024/messages-2021-05-25.png?rf=1024" },
-  { id: "wallpapers", name: "Wallpapers",icon: "https://cdn.jim-nielsen.com/macos/1024/photos-2021-05-28.png?rf=1024" },
-  { id: "contact",    name: "Contact",   icon: "https://cdn.jim-nielsen.com/macos/1024/mail-2021-05-25.png?rf=1024" },
-  { id: "divider-social", name: "", icon: "", divider: true },
-  { id: "instagram",  name: "Instagram", icon: "/icons/instagram.png", href: "https://www.instagram.com/aza4n/", iconSizePx: 38 },
-  { id: "linkedin",   name: "LinkedIn",  icon: "/icons/linkedin.png",  href: "https://www.linkedin.com/in/azaanism/", iconSizePx: 38 },
+  { id: "roast",      name: "Roast",      icon: "https://cdn.jim-nielsen.com/macos/1024/music-2021-05-25.png?rf=1024" },
+  { id: "terminal",   name: "Terminal",   icon: "https://cdn.jim-nielsen.com/macos/1024/terminal-2021-06-03.png?rf=1024" },
+  { id: "history",    name: "History",    icon: "https://cdn.jim-nielsen.com/macos/1024/messages-2021-05-25.png?rf=1024" },
+  { id: "wallpapers", name: "Wallpapers", icon: "https://cdn.jim-nielsen.com/macos/1024/photos-2021-05-28.png?rf=1024" },
+  { id: "contact",    name: "Contact",    icon: "https://cdn.jim-nielsen.com/macos/1024/mail-2021-05-25.png?rf=1024" },
 ];
 
 const FOLDER_SVG_NORMAL = (
@@ -701,48 +698,26 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
       className="fixed z-[200] left-1/2 -translate-x-1/2"
       style={{
         bottom: "calc(16px + env(safe-area-inset-bottom))",
-        boxShadow: "0 6px 6px rgba(0,0,0,0.2), 0 0 20px rgba(0,0,0,0.1)",
         borderRadius: 28,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12)",
       }}
     >
       {/* Glass layer 1 — distortion + blur */}
-      <div
-        className="absolute inset-0 z-0 overflow-hidden"
-        style={{
-          borderRadius: 28,
-          backdropFilter: "blur(3px)",
-          filter: "url(#glass-distortion)",
-          isolation: "isolate",
-        }}
-      />
+      <div className="absolute inset-0 z-0 overflow-hidden" style={{ borderRadius: 28, backdropFilter: "blur(3px)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
       {/* Glass layer 2 — white tint */}
-      <div
-        className="absolute inset-0 z-10"
-        style={{ borderRadius: 28, background: "rgba(255,255,255,0.25)" }}
-      />
+      <div className="absolute inset-0 z-10" style={{ borderRadius: 28, background: "rgba(255,255,255,0.28)" }} />
       {/* Glass layer 3 — inner highlight */}
-      <div
-        className="absolute inset-0 z-20 overflow-hidden"
-        style={{
-          borderRadius: 28,
-          boxShadow: "inset 2px 2px 1px 0 rgba(255,255,255,0.5), inset -1px -1px 1px 1px rgba(255,255,255,0.5)",
-        }}
-      />
+      <div className="absolute inset-0 z-20 overflow-hidden" style={{ borderRadius: 28, boxShadow: "inset 2px 2px 1px 0 rgba(255,255,255,0.55), inset -1px -1px 1px 1px rgba(255,255,255,0.55)" }} />
 
       {/* Icons */}
-      <div className="relative z-30 flex items-end gap-3 px-5 py-2">
-        {DOCK_APPS.map((app) => app.divider ? (
-          <div key={app.id} className="self-stretch flex items-center mx-0.5">
-            <div className="w-px h-10 rounded-full" style={{ background: "rgba(0,0,0,0.15)" }} />
-          </div>
-        ) : (
+      <div className="relative z-30 flex items-center gap-1 px-4 py-2.5">
+        {DOCK_APPS.map((app) => (
           <button
             key={app.id}
-            onClick={() => app.href ? window.open(app.href, "_blank", "noopener noreferrer") : handlePress(app.id)}
-            className="flex items-center justify-center"
+            onClick={() => handlePress(app.id)}
             style={{
-              transform: pressed === app.id ? "scale(1.15)" : "scale(1)",
-              transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
+              transform: pressed === app.id ? "scale(0.88)" : "scale(1)",
+              transition: "transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 2.2)",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -750,7 +725,7 @@ function MobileDock({ onPress }: { onPress: (id: string) => void }) {
               src={app.icon}
               alt={app.name}
               className="select-none"
-              style={{ width: app.iconSizePx ?? 48, height: app.iconSizePx ?? 48, objectFit: "contain" }}
+              style={{ width: 52, height: 52, objectFit: "contain" }}
             />
           </button>
         ))}
